@@ -158,3 +158,44 @@ setTargetBtn.addEventListener("click", () => {
 
 // Jalankan awal
 updateDisplay();
+
+// ====== Swipe Tabs ======
+const tabsContainer = document.getElementById("tabsContainer");
+const dots = document.querySelectorAll(".dot");
+let currentTab = 0;
+
+function updateDots() {
+  dots.forEach((d, i) => {
+    d.classList.toggle("active", i === currentTab);
+  });
+}
+
+tabsContainer.addEventListener("touchstart", handleTouchStart, false);
+tabsContainer.addEventListener("touchmove", handleTouchMove, false);
+
+let x1 = null;
+function handleTouchStart(e) {
+  x1 = e.touches[0].clientX;
+}
+
+function handleTouchMove(e) {
+  if (!x1) return;
+  let x2 = e.touches[0].clientX;
+  let diff = x1 - x2;
+
+  if (diff > 50 && currentTab < 2) currentTab++; // geser kiri
+  else if (diff < -50 && currentTab > 0) currentTab--; // geser kanan
+
+  tabsContainer.style.transform = `translateX(-${currentTab * 100}%)`;
+  updateDots();
+  x1 = null;
+}
+
+// Klik dot juga bisa pindah tab
+dots.forEach((dot, index) => {
+  dot.addEventListener("click", () => {
+    currentTab = index;
+    tabsContainer.style.transform = `translateX(-${index * 100}%)`;
+    updateDots();
+  });
+});
