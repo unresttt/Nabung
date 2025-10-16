@@ -1,72 +1,59 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Aplikasi Tabungan</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
-<body class="light">
-  <div id="app">
+<body>
+  <main class="app">
     <h1>💰 Aplikasi Tabungan</h1>
-
-    <div id="tabsContainer" class="tabs-container">
-      <!-- ====== TAB 1: TARGET TABUNGAN ====== -->
-      <section class="tab">
+    <section id="tabsContainer" class="tabs-container">
+      <article class="tab-page">
         <div class="card">
           <h2>🎯 Daftar Target Tabungan</h2>
-          <button id="addTargetBtn" class="add-target">+ Tambah Target</button>
+          <button id="addTarget" class="btn add">+ Tambah Target</button>
           <div id="targetList"></div>
         </div>
-      </section>
+      </article>
 
-      <!-- ====== TAB 2: TABUNGAN & DENDA ====== -->
-      <section class="tab">
+      <article class="tab-page">
         <div class="card">
           <h2>🤝 Tabungan Tiap Ketemu</h2>
-          <p id="tabunganDisplay">Rp 0</p>
-          <div class="buttons">
-            <button id="tabungBtnKetemu" class="tabung">Tabung +Rp5.000</button>
-            <button id="resetKetemu" class="reset">Reset</button>
-          </div>
+          <p id="tabungan">Rp 0</p>
+          <button id="btnTabungan" class="btn blue">Tabung +Rp5.000</button>
+          <button id="resetTabungan" class="btn red">Reset</button>
         </div>
 
         <div class="card">
           <h2>⚠️ Denda</h2>
-          <p id="dendaDisplay">Rp 0</p>
-          <div class="buttons">
-            <button id="tabungBtnDenda" class="tabung">Tabung +Rp50.000</button>
-            <button id="resetDenda" class="reset">Reset</button>
-          </div>
+          <p id="denda">Rp 0</p>
+          <button id="btnDenda" class="btn blue">Tabung +Rp50.000</button>
+          <button id="resetDenda" class="btn red">Reset</button>
         </div>
+      </article>
 
+      <article class="tab-page">
         <div class="card total">
           <h2>Total Keseluruhan</h2>
-          <p id="totalDisplay">Rp 0</p>
+          <p id="total">Rp 0</p>
+          <small>(Total gabungan semua tabungan, target & denda)</small>
         </div>
-      </section>
+      </article>
 
-      <!-- ====== TAB 3: RIWAYAT ====== -->
-      <section class="tab">
+      <article class="tab-page">
         <div class="card">
           <h2>📜 Riwayat Transaksi</h2>
-          <ul id="riwayatList">
-            <li><em>Belum ada transaksi</em></li>
-          </ul>
-          <button id="hapusRiwayat" class="reset">Hapus Riwayat</button>
+          <ul id="riwayat"><li><i>Belum ada transaksi</i></li></ul>
+          <button id="resetRiwayat" class="btn red">Hapus Riwayat</button>
         </div>
-      </section>
-    </div>
+      </article>
+    </section>
 
-    <div class="dots">
-      <span class="dot active"></span>
-      <span class="dot"></span>
-      <span class="dot"></span>
-    </div>
-
-    <button id="theme-toggle" class="theme-toggle">🌙</button>
-  </div>
-
+    <div id="dots" class="dots"></div>
+    <button id="theme" class="theme">🌙</button>
+  </main>
   <script src="app.js"></script>
 </body>
 </html>
