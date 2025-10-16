@@ -164,16 +164,21 @@ tabsContainer.addEventListener("scroll", () => {
 const themeToggle = document.getElementById("theme-toggle");
 let currentTheme = localStorage.getItem("theme") || "light";
 document.body.classList.add(currentTheme);
-themeToggle.textContent = currentTheme === "light" ? "🌙 Gelap" : "☀️ Terang";
+
+function updateThemeButton() {
+  const isLight = document.body.classList.contains("light");
+  themeToggle.textContent = isLight ? "🌙 Gelap" : "☀️ Terang";
+}
+
+updateThemeButton();
 
 themeToggle.addEventListener("click", () => {
   if (document.body.classList.contains("light")) {
     document.body.classList.replace("light", "dark");
-    themeToggle.textContent = "☀️ Terang";
     localStorage.setItem("theme", "dark");
   } else {
     document.body.classList.replace("dark", "light");
-    themeToggle.textContent = "🌙 Gelap";
     localStorage.setItem("theme", "light");
   }
+  updateThemeButton();
 });
