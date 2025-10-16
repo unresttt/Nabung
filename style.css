@@ -21,7 +21,7 @@ body {
 #app {
   text-align: center;
   width: 90%;
-  max-width: 400px;
+  max-width: 420px;
 }
 
 h1 {
@@ -42,14 +42,6 @@ h1 {
   background: rgba(40, 40, 40, 0.8);
 }
 
-.card.total {
-  background: rgba(255, 255, 255, 0.8);
-}
-
-.dark .card.total {
-  background: rgba(50, 50, 50, 0.9);
-}
-
 button {
   border: none;
   padding: 10px 15px;
@@ -64,23 +56,25 @@ button.tabung {
   background-color: #007bff;
 }
 
-button.tabung:hover {
-  background-color: #0056b3;
-}
-
 button.reset {
   background-color: #dc3545;
 }
 
-button.reset:hover {
-  background-color: #b02a37;
+button.add-target {
+  background-color: #00c896;
+  margin-bottom: 10px;
+}
+
+button:hover {
+  opacity: 0.8;
 }
 
 input {
-  padding: 8px;
+  padding: 6px;
   border-radius: 8px;
   border: none;
-  margin-right: 5px;
+  margin: 3px;
+  width: 40%;
 }
 
 .progress-bar {
@@ -92,11 +86,22 @@ input {
   margin-top: 8px;
 }
 
-#progressFill {
+.progress {
   height: 100%;
   background: linear-gradient(90deg, #00ffcc, #00aaff);
   width: 0%;
   transition: width 0.3s;
+}
+
+.target-card {
+  border-radius: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.4);
+  margin: 10px 0;
+}
+
+.dark .target-card {
+  background: rgba(50, 50, 50, 0.7);
 }
 
 .theme-toggle {
@@ -119,7 +124,7 @@ input {
   color: #ffd700;
 }
 
-/* ✅ Swipe Tabs aktif */
+/* Swipe Tabs */
 .tabs-container {
   display: flex;
   overflow-x: scroll;
