@@ -11,46 +11,65 @@
   <div class="container">
     <h1>💰 Aplikasi Tabungan</h1>
 
-    <div class="card">
-      <h2><span class="icon">🤝</span> Tabungan Tiap Ketemu</h2>
-      <p id="tabungan">Rp 0</p>
-      <div class="actions">
-        <button id="btn-tabungan">Tabung +Rp5.000</button>
-        <button id="reset-tabungan" class="reset">Reset</button>
-      </div>
+    <!-- Wrapper untuk slide -->
+    <div class="tabs-container" id="tabsContainer">
+      
+      <!-- === TAB 1 === -->
+      <section class="tab-page active">
+        <div class="card">
+          <h2>🤝 Tabungan Tiap Ketemu</h2>
+          <p id="tabungan">Rp 0</p>
+          <div class="actions">
+            <button id="btn-tabungan">Tabung +Rp5.000</button>
+            <button id="reset-tabungan" class="reset">Reset</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>⚠️ Denda</h2>
+          <p id="denda">Rp 0</p>
+          <div class="actions">
+            <button id="btn-denda">Tabung +Rp50.000</button>
+            <button id="reset-denda" class="reset">Reset</button>
+          </div>
+        </div>
+
+        <div class="total-card">
+          <h3>Total Keseluruhan</h3>
+          <p id="total">Rp 0</p>
+        </div>
+      </section>
+
+      <!-- === TAB 2 === -->
+      <section class="tab-page">
+        <div class="card target">
+          <h3>🎯 Target Tabungan</h3>
+          <div class="target-info">
+            <input type="number" id="input-target" placeholder="Masukkan target (Rp)" />
+            <button id="set-target">Set Target</button>
+          </div>
+          <p id="progress-text">Belum ada target</p>
+          <div class="progress-bar">
+            <div id="progress-fill"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- === TAB 3 === -->
+      <section class="tab-page">
+        <div class="history-card">
+          <h3>Riwayat Transaksi</h3>
+          <ul id="history-list"></ul>
+          <button id="reset-history" class="reset all">Hapus Riwayat</button>
+        </div>
+      </section>
     </div>
 
-    <div class="card">
-      <h2><span class="icon">⚠️</span> Denda</h2>
-      <p id="denda">Rp 0</p>
-      <div class="actions">
-        <button id="btn-denda">Tabung +Rp50.000</button>
-        <button id="reset-denda" class="reset">Reset</button>
-      </div>
-    </div>
-
-    <div class="total-card">
-      <h3>Total Keseluruhan</h3>
-      <p id="total">Rp 0</p>
-    </div>
-
-    <!-- 🎯 Target Tabungan -->
-    <div class="card target">
-      <h3>🎯 Target Tabungan</h3>
-      <div class="target-info">
-        <input type="number" id="input-target" placeholder="Masukkan target (Rp)" />
-        <button id="set-target">Set Target</button>
-      </div>
-      <p id="progress-text">Belum ada target</p>
-      <div class="progress-bar">
-        <div id="progress-fill"></div>
-      </div>
-    </div>
-
-    <div class="history-card">
-      <h3>Riwayat Transaksi</h3>
-      <ul id="history-list"></ul>
-      <button id="reset-history" class="reset all">Hapus Riwayat</button>
+    <!-- Indikator Tab -->
+    <div class="tab-dots">
+      <span class="dot active"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
     </div>
   </div>
 
