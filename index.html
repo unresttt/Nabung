@@ -11,18 +11,16 @@
     <h1>💰 Aplikasi Tabungan</h1>
 
     <div id="tabsContainer" class="tabs-container">
-      <!-- ====== TAB 1 ====== -->
+      <!-- ====== TAB 1: TARGET TABUNGAN ====== -->
       <section class="tab">
         <div class="card">
-          <h2>🎯 Target Tabungan</h2>
-          <input type="number" id="targetInput" placeholder="Masukkan target (Rp)" />
-          <button id="setTarget">Set Target</button>
-          <p id="progressText">Progress: Rp 0 / Rp 0 (0%)</p>
-          <div class="progress-bar"><div id="progressFill"></div></div>
+          <h2>🎯 Daftar Target Tabungan</h2>
+          <button id="addTargetBtn" class="add-target">+ Tambah Target</button>
+          <div id="targetList"></div>
         </div>
       </section>
 
-      <!-- ====== TAB 2 ====== -->
+      <!-- ====== TAB 2: TABUNGAN & DENDA ====== -->
       <section class="tab">
         <div class="card">
           <h2>🤝 Tabungan Tiap Ketemu</h2>
@@ -48,7 +46,7 @@
         </div>
       </section>
 
-      <!-- ====== TAB 3 ====== -->
+      <!-- ====== TAB 3: RIWAYAT ====== -->
       <section class="tab">
         <div class="card">
           <h2>📜 Riwayat Transaksi</h2>
