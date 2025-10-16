@@ -16,9 +16,7 @@ function tambahRiwayat(teks){
   riwayat.unshift(`[${w}] ${teks}`);if(riwayat.length>100)riwayat.pop();
   simpan();render();
 }
-function totalAll(){
-  return tabungan+denda+targets.reduce((a,b)=>a+(+b.saved||0),0);
-}
+function totalAll(){return tabungan+denda+targets.reduce((a,b)=>a+(+b.saved||0),0);}
 function render(){
   el("tabungan").textContent=rp(tabungan);
   el("denda").textContent=rp(denda);
@@ -40,14 +38,8 @@ function render(){
       </div>`;
   });
 }
-function tabungTarget(i){
-  targets[i].saved+=+targets[i].step;
-  tambahRiwayat(`+${rp(targets[i].step)} ke target "${targets[i].name}"`);
-}
-function hapusTarget(i){
-  if(confirm("Hapus target ini?"))targets.splice(i,1);
-  simpan();render();
-}
+function tabungTarget(i){targets[i].saved+=+targets[i].step;tambahRiwayat(`+${rp(targets[i].step)} ke target "${targets[i].name}"`);}
+function hapusTarget(i){if(confirm("Hapus target ini?"))targets.splice(i,1);simpan();render();}
 function editTarget(i){
   const t=targets[i];
   const n=prompt("Nama target:",t.name)||t.name;
@@ -68,12 +60,25 @@ el("btnDenda").onclick=()=>{denda+=5e4;tambahRiwayat("+Rp50.000 (Denda)");};
 el("resetTabungan").onclick=()=>{if(confirm("Reset tabungan?"))tabungan=0;render();};
 el("resetDenda").onclick=()=>{if(confirm("Reset denda?"))denda=0;render();};
 el("resetRiwayat").onclick=()=>{if(confirm("Hapus riwayat?"))riwayat=[];render();};
+
 function swipeTabs(){
   const cont=el("tabsContainer"),dots=el("dots"),tabs=[...document.querySelectorAll(".tab-page")];
-  dots.innerHTML="";tabs.forEach((_,i)=>{const d=document.createElement("div");d.onclick=()=>cont.scrollTo({left:i*cont.offsetWidth,behavior:"smooth"});dots.appendChild(d);});
-  const up=()=>{const a=Math.round(cont.scrollLeft/cont.offsetWidth);dots.querySelectorAll("div").forEach((d,i)=>d.classList.toggle("active",i===a));};
-  cont.addEventListener("scroll",up);up();
+  dots.innerHTML="";tabs.forEach((_,i)=>{const d=document.createElement("div");d.onclick=()=>scrollToTab(i);dots.appendChild(d);});
+  function scrollToTab(i){
+    cont.scrollTo({left:i*cont.offsetWidth,behavior:"smooth"});
+    setActive(i);
+  }
+  function setActive(i){
+    tabs.forEach((t,j)=>t.classList.toggle("active",j===i));
+    dots.querySelectorAll("div").forEach((d,j)=>d.classList.toggle("active",j===i));
+  }
+  cont.addEventListener("scroll",()=>{
+    const i=Math.round(cont.scrollLeft/cont.offsetWidth);
+    setActive(i);
+  });
+  setActive(0);
 }
+
 function tema(){
   const btn=el("theme");
   let d=localStorage.theme==="dark";
@@ -85,4 +90,5 @@ function tema(){
     btn.textContent=d?"☀":"🌙";
   };
 }
+
 tema();swipeTabs();render();
