@@ -1,201 +1,139 @@
-* {
-  font-family: "Inter", sans-serif;
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
 body {
-  background: var(--bg-color);
-  color: var(--text-color);
-  transition: background 0.4s ease, color 0.4s ease;
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  transition: background 0.5s, color 0.5s;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
   min-height: 100vh;
 }
 
-.container {
-  padding: 20px;
-  max-width: 500px;
-  margin: auto;
+.app-container {
   text-align: center;
-  position: relative;
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
 }
 
 h1 {
-  margin-bottom: 20px;
+  margin-top: 10px;
 }
 
-.card, .total-card, .history-card {
-  background: var(--card-bg);
-  color: var(--text-color);
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  transition: background 0.4s ease, color 0.4s ease;
+.tabs {
+  display: flex;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+.tab {
+  min-width: 100%;
+  box-sizing: border-box;
+  padding: 15px 0;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  padding: 15px;
+  margin: 15px 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.total {
+  font-weight: bold;
 }
 
 button {
+  margin: 5px;
+  padding: 10px 16px;
+  font-size: 16px;
   border: none;
-  background: var(--text-color);
-  color: var(--bg-color);
-  padding: 8px 16px;
   border-radius: 10px;
   cursor: pointer;
-  font-weight: 600;
-  transition: background 0.3s ease, transform 0.2s ease;
+  transition: 0.3s;
+  color: white;
+  background: #007bff;
 }
 
 button:hover {
-  transform: scale(1.05);
+  opacity: 0.8;
 }
 
-.reset {
-  background: rgba(255, 0, 0, 0.7);
-  color: #fff;
+.reset-btn {
+  background: #dc3545;
 }
 
-.actions {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-
-/* Progress Bar Target */
 .progress-bar {
   width: 100%;
-  height: 15px;
-  background: rgba(255, 255, 255, 0.3);
+  height: 12px;
+  background: #666;
   border-radius: 10px;
-  overflow: hidden;
-  margin-top: 8px;
+  margin-top: 10px;
 }
 
-#progress-fill {
-  height: 100%;
+.progress {
+  height: 12px;
+  background: linear-gradient(to right, #00e1ff, #00ff6a);
+  border-radius: 10px;
   width: 0%;
-  background: linear-gradient(90deg, #00ff99, #00ccff);
-  transition: width 0.5s ease;
+  transition: width 0.5s;
 }
 
-/* ===== Swipe Tab System ===== */
-.tabs-container {
-  display: flex;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
-  width: 100%;
-}
-
-.tab-page {
-  flex: 0 0 100%;
-  scroll-snap-align: start;
-  padding: 10px;
-  min-height: 75vh;
-  transition: opacity 0.4s ease;
-}
-
-.tabs-container::-webkit-scrollbar {
-  display: none;
-}
-
-.tab-dots {
+.dots {
   display: flex;
   justify-content: center;
-  gap: 8px;
-  margin-top: 15px;
+  margin-top: 20px;
 }
 
 .dot {
-  width: 10px;
   height: 10px;
-  background: rgba(255,255,255,0.4);
+  width: 10px;
+  background: #bbb;
   border-radius: 50%;
+  margin: 0 5px;
   transition: background 0.3s;
 }
 
 .dot.active {
-  background: white;
+  background: #333;
 }
 
-/* ===== Mode Terang & Gelap ===== */
-body.light {
-  --bg-color: linear-gradient(135deg, #a1c4fd, #c2e9fb);
-  --card-bg: rgba(255, 255, 255, 0.25);
-  --text-color: #000;
-}
-
-body.dark {
-  --bg-color: linear-gradient(135deg, #232526, #414345);
-  --card-bg: rgba(40, 40, 40, 0.5);
-  --text-color: #fff;
-}
-
+/* Tombol tema */
 .theme-toggle {
   position: fixed;
-  bottom: 25px;
-  right: 25px;
-  background: var(--card-bg);
-  color: var(--text-color);
+  bottom: 20px;
+  right: 20px;
   border: none;
-  border-radius: 25px;
-  padding: 8px 16px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.3);
   backdrop-filter: blur(6px);
-  transition: all 0.3s ease;
-  z-index: 99;
+  padding: 10px 14px;
+  font-size: 20px;
+  cursor: pointer;
+  transition: 0.3s;
 }
 
 .theme-toggle:hover {
-  transform: scale(1.05);
-  opacity: 0.9;
+  transform: scale(1.1);
 }
 
-/* ===== FIX: Tombol teks hilang setelah ganti tema ===== */
-
-/* Warna tombol umum */
-button {
-  color: #fff;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  transition: background 0.3s, color 0.3s;
-}
-
-/* Tombol tabung (hijau & biru) tetap kontras di dua mode */
-button#btn-tabungan {
-  background: #00c896;
-}
-button#btn-tabungan:hover {
-  background: #00a87d;
-}
-
-button#btn-denda {
-  background: #007bff;
-}
-button#btn-denda:hover {
-  background: #006be0;
-}
-
-/* Tombol reset */
-button.reset {
-  background: rgba(255, 255, 255, 0.25);
+/* Mode terang */
+body.light {
+  background: linear-gradient(to bottom, #b0d8ff, #e6f0ff);
   color: #000;
 }
-body.dark button.reset {
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
-}
-button.reset:hover {
-  opacity: 0.8;
+
+/* Mode gelap */
+body.dark {
+  background: #202020;
+  color: white;
 }
 
-/* Warna teks tombol sesuai tema */
-body.light button {
-  color: #fff !important;
+body.dark .card {
+  background: rgba(50, 50, 50, 0.6);
 }
-body.dark button {
-  color: #fff !important;
+
+body.light .card {
+  background: rgba(255, 255, 255, 0.4);
 }
