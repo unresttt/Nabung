@@ -31,7 +31,7 @@ h1 {
   font-weight: 700;
 }
 
-.card, .total-card {
+.card, .total-card, .history-card {
   background: rgba(255, 255, 255, 0.18);
   border-radius: 16px;
   padding: 20px;
@@ -110,4 +110,39 @@ button {
 .total-card p {
   font-size: 1.5rem;
   font-weight: 700;
+}
+
+/* ====== History Section ====== */
+.history-card {
+  background: rgba(255, 255, 255, 0.15);
+  text-align: left;
+}
+
+.history-card h3 {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+#history-list {
+  max-height: 180px;
+  overflow-y: auto;
+  list-style: none;
+  font-size: 0.9rem;
+  padding-right: 5px;
+}
+
+#history-list li {
+  margin-bottom: 6px;
+  border-left: 3px solid #00cec9;
+  padding-left: 8px;
+  opacity: 0.9;
+}
+
+.reset.all {
+  display: block;
+  margin: 10px auto 0;
+  background: rgba(255,255,255,0.25);
+}
+.reset.all:hover {
+  background: rgba(255,255,255,0.4);
 }
