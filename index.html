@@ -2,26 +2,37 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Aplikasi Tabungan</title>
   <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="container">
-    <h1>Aplikasi Tabungan</h1>
+    <h1>💰 Aplikasi Tabungan</h1>
 
     <div class="card">
-      <h2>Tabungan Tiap Ketemu</h2>
+      <h2><span class="icon">🤝</span> Tabungan Tiap Ketemu</h2>
       <p id="tabungan">Rp 0</p>
-      <button id="btn-tabungan">Tabung</button>
+      <div class="actions">
+        <button id="btn-tabungan">Tabung +Rp5.000</button>
+        <button id="reset-tabungan" class="reset">Reset</button>
+      </div>
     </div>
 
     <div class="card">
-      <h2>Denda</h2>
+      <h2><span class="icon">⚠️</span> Denda</h2>
       <p id="denda">Rp 0</p>
-      <button id="btn-denda">Tabung</button>
+      <div class="actions">
+        <button id="btn-denda">Tabung +Rp50.000</button>
+        <button id="reset-denda" class="reset">Reset</button>
+      </div>
     </div>
 
+    <div class="total-card">
+      <h3>Total Keseluruhan</h3>
+      <p id="total">Rp 0</p>
+    </div>
   </div>
 
   <script src="app.js"></script>
