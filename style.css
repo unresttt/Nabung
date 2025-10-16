@@ -189,7 +189,7 @@ button {
 /* ===== Swipe Tab System ===== */
 .tabs-container {
   display: flex;
-  overflow: hidden;
+  overflow-x: auto; /* ✅ biar bisa swipe langsung */
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
   width: 100%;
@@ -197,9 +197,14 @@ button {
 
 .tab-page {
   flex: 0 0 100%;
-  scroll-snap-align: center;
+  scroll-snap-align: start;
   padding: 10px;
-  transition: transform 0.3s ease;
+  transition: opacity 0.4s ease;
+  min-height: 75vh;
+}
+
+.tabs-container::-webkit-scrollbar {
+  display: none; /* sembunyikan scrollbar */
 }
 
 .tab-dots {
@@ -219,4 +224,4 @@ button {
 
 .dot.active {
   background: white;
-  }
+}
