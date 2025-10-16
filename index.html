@@ -1,64 +1,79 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Aplikasi Tabungan</title>
   <link rel="stylesheet" href="style.css" />
+  <!-- Firebase (compat) SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 </head>
 <body>
-  <div class="app">
-    <h1>💰 Aplikasi Tabungan</h1>
+  <header class="app-header">
+    <div class="logo">💰</div>
+    <h1>Aplikasi Tabungan</h1>
+  </header>
 
+  <main class="tabs-wrapper">
     <div id="tabsContainer" class="tabs-container">
-      <!-- ===== TAB 1: Target Tabungan ===== -->
-      <div class="tab-page" id="tab1">
+      <!-- Tab 1: Daftar Target -->
+      <section class="tab fullscreen" data-tab="0" id="tab-targets">
         <div class="card">
           <h2>🎯 Daftar Target Tabungan</h2>
-          <button id="addTargetBtn" class="btn add">+ Tambah Target</button>
-          <div id="targetList"></div>
+          <button id="btn-add-target" class="btn green">+ Tambah Target</button>
+          <div id="targetsList" class="targets-list"></div>
         </div>
-      </div>
+      </section>
 
-      <!-- ===== TAB 2: Tabungan & Denda ===== -->
-      <div class="tab-page" id="tab2">
+      <!-- Tab 2: Tabungan tiap ketemu & Denda -->
+      <section class="tab fullscreen" data-tab="1" id="tab-meet">
         <div class="card">
           <h2>🤝 Tabungan Tiap Ketemu</h2>
-          <p id="saveDisplay">Rp 0</p>
-          <button id="addSave" class="btn blue">Tabung +Rp5.000</button>
-          <button id="resetSave" class="btn red">Reset</button>
-        </div>
-
-        <div class="card">
+          <div class="row actions">
+            <button id="btn-meet-add" class="btn blue">Tabung +Rp5.000</button>
+            <button id="btn-meet-reset" class="btn red">Reset</button>
+          </div>
+          <hr/>
           <h2>⚠️ Denda</h2>
-          <p id="fineDisplay">Rp 0</p>
-          <button id="addFine" class="btn blue">Tabung +Rp50.000</button>
-          <button id="resetFine" class="btn red">Reset</button>
+          <div class="row actions">
+            <button id="btn-fine-add" class="btn blue">Tabung +Rp50.000</button>
+            <button id="btn-fine-reset" class="btn red">Reset</button>
+          </div>
         </div>
-      </div>
+      </section>
 
-      <!-- ===== TAB 3: Total Keseluruhan ===== -->
-      <div class="tab-page" id="tab3">
-        <div class="card total">
+      <!-- Tab 3: Total Keseluruhan -->
+      <section class="tab fullscreen" data-tab="2" id="tab-total">
+        <div class="card center">
           <h2>Total Keseluruhan</h2>
-          <p id="totalDisplay">Rp 0</p>
-          <small>(Total gabungan semua tabungan, target & denda)</small>
+          <div id="totalAmount" class="big-amount">Rp 0</div>
+          <p class="muted">(Total gabungan semua tabungan & denda)</p>
         </div>
-      </div>
+      </section>
 
-      <!-- ===== TAB 4: Riwayat Transaksi ===== -->
-      <div class="tab-page" id="tab4">
+      <!-- Tab 4: Riwayat Transaksi -->
+      <section class="tab fullscreen" data-tab="3" id="tab-history">
         <div class="card">
           <h2>📜 Riwayat Transaksi</h2>
-          <ul id="historyList"></ul>
-          <button id="clearHistory" class="btn red">Hapus Riwayat</button>
+          <ul id="historyList" class="history-list">
+            <li class="muted">Belum ada transaksi</li>
+          </ul>
+          <button id="btn-clear-history" class="btn red">Hapus Riwayat</button>
         </div>
-      </div>
+      </section>
     </div>
+  </main>
 
-    <div class="dots" id="dots"></div>
-    <button id="theme-toggle" class="theme">🌙</button>
-  </div>
+  <nav class="dots">
+    <div id="dot0" class="dot active"></div>
+    <div id="dot1" class="dot"></div>
+    <div id="dot2" class="dot"></div>
+    <div id="dot3" class="dot"></div>
+  </nav>
+
+  <!-- dark toggle bottom-right -->
+  <button id="theme-toggle" class="fab">🌙</button>
 
   <script src="app.js"></script>
 </body>
