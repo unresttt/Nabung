@@ -152,3 +152,50 @@ body.dark {
   transform: scale(1.05);
   opacity: 0.9;
 }
+
+/* ===== FIX: Tombol teks hilang setelah ganti tema ===== */
+
+/* Warna tombol umum */
+button {
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* Tombol tabung (hijau & biru) tetap kontras di dua mode */
+button#btn-tabungan {
+  background: #00c896;
+}
+button#btn-tabungan:hover {
+  background: #00a87d;
+}
+
+button#btn-denda {
+  background: #007bff;
+}
+button#btn-denda:hover {
+  background: #006be0;
+}
+
+/* Tombol reset */
+button.reset {
+  background: rgba(255, 255, 255, 0.25);
+  color: #000;
+}
+body.dark button.reset {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+button.reset:hover {
+  opacity: 0.8;
+}
+
+/* Warna teks tombol sesuai tema */
+body.light button {
+  color: #fff !important;
+}
+body.dark button {
+  color: #fff !important;
+}
