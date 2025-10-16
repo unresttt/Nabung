@@ -9,10 +9,17 @@ const resetTabungan = document.getElementById("reset-tabungan");
 const resetDenda = document.getElementById("reset-denda");
 const resetHistory = document.getElementById("reset-history");
 
+// 🎯 Elemen target tabungan
+const inputTarget = document.getElementById("input-target");
+const setTargetBtn = document.getElementById("set-target");
+const progressText = document.getElementById("progress-text");
+const progressFill = document.getElementById("progress-fill");
+
 // Ambil data dari localStorage
 let tabungan = Number(localStorage.getItem("tabungan")) || 0;
 let denda = Number(localStorage.getItem("denda")) || 0;
 let history = JSON.parse(localStorage.getItem("history")) || [];
+let targetTabungan = Number(localStorage.getItem("targetTabungan")) || 0;
 
 // Format Rupiah
 function formatRupiah(angka) {
@@ -44,10 +51,12 @@ function updateDisplay(animated = false) {
 
   totalEl.textContent = formatRupiah(tabungan + denda);
   renderHistory();
+  updateTargetDisplay();
 
   localStorage.setItem("tabungan", tabungan);
   localStorage.setItem("denda", denda);
   localStorage.setItem("history", JSON.stringify(history));
+  localStorage.setItem("targetTabungan", targetTabungan);
 }
 
 // Tambah riwayat
@@ -83,6 +92,24 @@ function renderHistory() {
   });
 }
 
+// 🎯 Update tampilan target tabungan
+function updateTargetDisplay() {
+  if (targetTabungan <= 0) {
+    progressText.textContent = "Belum ada target";
+    progressFill.style.width = "0%";
+    return;
+  }
+
+  const total = tabungan + denda;
+  const progress = Math.min((total / targetTabungan) * 100, 100);
+  progressFill.style.width = progress + "%";
+  progressText.textContent = `Progress: ${formatRupiah(total)} / ${formatRupiah(targetTabungan)} (${Math.floor(progress)}%)`;
+
+  if (progress >= 100) {
+    progressText.textContent += " 🎉 Target Tercapai!";
+  }
+}
+
 // Event tombol
 btnTabungan.addEventListener("click", () => {
   tabungan += 5000;
@@ -114,6 +141,18 @@ resetHistory.addEventListener("click", () => {
   if (confirm("Hapus semua riwayat transaksi?")) {
     history = [];
     updateDisplay();
+  }
+});
+
+// 🎯 Set target baru
+setTargetBtn.addEventListener("click", () => {
+  const val = Number(inputTarget.value);
+  if (val > 0) {
+    targetTabungan = val;
+    localStorage.setItem("targetTabungan", targetTabungan);
+    updateTargetDisplay();
+  } else {
+    alert("Masukkan nominal target yang valid!");
   }
 });
 
