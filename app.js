@@ -117,5 +117,28 @@ resetHistory.addEventListener("click", () => {
   }
 });
 
+// Fungsi untuk memuat riwayat sesuai filter
+function loadRiwayat(filteredType = "all") {
+  const riwayatList = document.getElementById("riwayatList");
+  riwayatList.innerHTML = "";
+
+  riwayat.forEach(item => {
+    if (
+      filteredType === "all" ||
+      (filteredType === "tabungan" && item.includes("Tabungan Tiap Ketemu")) ||
+      (filteredType === "denda" && item.includes("Denda"))
+    ) {
+      const p = document.createElement("p");
+      p.textContent = item;
+      riwayatList.appendChild(p);
+    }
+  });
+}
+
+// Event untuk filter select
+document.getElementById("filterRiwayat").addEventListener("change", (e) => {
+  loadRiwayat(e.target.value);
+});
+
 // Jalankan awal
 updateDisplay();
