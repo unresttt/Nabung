@@ -131,20 +131,24 @@ body.dark {
 }
 
 .theme-toggle {
-  position: absolute;
-  top: 20px;
+  position: fixed;
+  bottom: 25px;
   right: 25px;
   background: var(--card-bg);
   color: var(--text-color);
   border: none;
-  border-radius: 20px;
-  padding: 6px 14px;
-  font-size: 14px;
+  border-radius: 25px;
+  padding: 8px 16px;
+  font-size: 15px;
+  font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(6px);
   transition: all 0.3s ease;
+  z-index: 99;
 }
 
 .theme-toggle:hover {
-  opacity: 0.85;
+  transform: scale(1.05);
+  opacity: 0.9;
 }
