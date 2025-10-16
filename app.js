@@ -9,46 +9,27 @@ const resetTabungan = document.getElementById("reset-tabungan");
 const resetDenda = document.getElementById("reset-denda");
 const resetHistory = document.getElementById("reset-history");
 
-// 🎯 Elemen target tabungan
+// Target tabungan
 const inputTarget = document.getElementById("input-target");
 const setTargetBtn = document.getElementById("set-target");
 const progressText = document.getElementById("progress-text");
 const progressFill = document.getElementById("progress-fill");
 
-// Ambil data dari localStorage
+// Data awal
 let tabungan = Number(localStorage.getItem("tabungan")) || 0;
 let denda = Number(localStorage.getItem("denda")) || 0;
 let history = JSON.parse(localStorage.getItem("history")) || [];
 let targetTabungan = Number(localStorage.getItem("targetTabungan")) || 0;
 
-// Format Rupiah
+// Format rupiah
 function formatRupiah(angka) {
   return "Rp " + angka.toLocaleString("id-ID");
 }
 
-// Fungsi animasi angka naik
-function animateValue(el, start, end, duration) {
-  const range = end - start;
-  let startTime = null;
-  function step(currentTime) {
-    if (!startTime) startTime = currentTime;
-    const progress = Math.min((currentTime - startTime) / duration, 1);
-    el.textContent = formatRupiah(Math.floor(start + range * progress));
-    if (progress < 1) requestAnimationFrame(step);
-  }
-  requestAnimationFrame(step);
-}
-
-// Tampilkan semua data
-function updateDisplay(animated = false) {
-  if (animated) {
-    animateValue(tabunganEl, parseInt(tabunganEl.textContent.replace(/\D/g, '')) || 0, tabungan, 300);
-    animateValue(dendaEl, parseInt(dendaEl.textContent.replace(/\D/g, '')) || 0, denda, 300);
-  } else {
-    tabunganEl.textContent = formatRupiah(tabungan);
-    dendaEl.textContent = formatRupiah(denda);
-  }
-
+// Update semua tampilan
+function updateDisplay() {
+  tabunganEl.textContent = formatRupiah(tabungan);
+  dendaEl.textContent = formatRupiah(denda);
   totalEl.textContent = formatRupiah(tabungan + denda);
   renderHistory();
   updateTargetDisplay();
@@ -63,22 +44,14 @@ function updateDisplay(animated = false) {
 function addHistory(jenis, jumlah) {
   const waktu = new Date();
   const waktuStr = waktu.toLocaleString("id-ID", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit"
+    day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit"
   });
-  history.unshift({
-    waktu: waktuStr,
-    jenis: jenis,
-    jumlah: jumlah
-  });
-  if (history.length > 50) history.pop(); // batasi max 50 entri
+  history.unshift({ waktu: waktuStr, jenis, jumlah });
+  if (history.length > 50) history.pop();
   updateDisplay();
 }
 
-// Render riwayat ke tampilan
+// Render riwayat
 function renderHistory() {
   historyList.innerHTML = "";
   if (history.length === 0) {
@@ -92,35 +65,29 @@ function renderHistory() {
   });
 }
 
-// 🎯 Update tampilan target tabungan
+// Update target
 function updateTargetDisplay() {
   if (targetTabungan <= 0) {
     progressText.textContent = "Belum ada target";
     progressFill.style.width = "0%";
     return;
   }
-
   const total = tabungan + denda;
   const progress = Math.min((total / targetTabungan) * 100, 100);
   progressFill.style.width = progress + "%";
   progressText.textContent = `Progress: ${formatRupiah(total)} / ${formatRupiah(targetTabungan)} (${Math.floor(progress)}%)`;
-
-  if (progress >= 100) {
-    progressText.textContent += " 🎉 Target Tercapai!";
-  }
+  if (progress >= 100) progressText.textContent += " 🎉 Target Tercapai!";
 }
 
-// Event tombol
+// Tombol event
 btnTabungan.addEventListener("click", () => {
   tabungan += 5000;
   addHistory("Tabungan Tiap Ketemu", 5000);
-  updateDisplay(true);
 });
 
 btnDenda.addEventListener("click", () => {
   denda += 50000;
   addHistory("Denda", 50000);
-  updateDisplay(true);
 });
 
 resetTabungan.addEventListener("click", () => {
@@ -138,13 +105,12 @@ resetDenda.addEventListener("click", () => {
 });
 
 resetHistory.addEventListener("click", () => {
-  if (confirm("Hapus semua riwayat transaksi?")) {
+  if (confirm("Hapus semua riwayat?")) {
     history = [];
     updateDisplay();
   }
 });
 
-// 🎯 Set target baru
 setTargetBtn.addEventListener("click", () => {
   const val = Number(inputTarget.value);
   if (val > 0) {
@@ -159,60 +125,55 @@ setTargetBtn.addEventListener("click", () => {
 // Jalankan awal
 updateDisplay();
 
-// ====== Swipe Tabs (final versi) ======
+// ===== Swipe Tabs =====
 const tabsContainer = document.getElementById("tabsContainer");
 const dots = document.querySelectorAll(".dot");
 let currentTab = 0;
 
 function updateDots() {
-  dots.forEach((d, i) => {
-    d.classList.toggle("active", i === currentTab);
-  });
+  dots.forEach((d, i) => d.classList.toggle("active", i === currentTab));
 }
-
-// Swipe manual
-tabsContainer.addEventListener("touchstart", handleTouchStart, false);
-tabsContainer.addEventListener("touchmove", handleTouchMove, false);
 
 let x1 = null;
-function handleTouchStart(e) {
-  x1 = e.touches[0].clientX;
-}
-
-function handleTouchMove(e) {
+tabsContainer.addEventListener("touchstart", e => x1 = e.touches[0].clientX);
+tabsContainer.addEventListener("touchmove", e => {
   if (!x1) return;
-  let x2 = e.touches[0].clientX;
-  let diff = x1 - x2;
-
-  if (diff > 50 && currentTab < 2) currentTab++; // geser kiri
-  else if (diff < -50 && currentTab > 0) currentTab--; // geser kanan
-
-  tabsContainer.scrollTo({
-    left: currentTab * tabsContainer.offsetWidth,
-    behavior: "smooth",
-  });
-
+  let diff = x1 - e.touches[0].clientX;
+  if (diff > 50 && currentTab < 2) currentTab++;
+  else if (diff < -50 && currentTab > 0) currentTab--;
+  tabsContainer.scrollTo({ left: currentTab * tabsContainer.offsetWidth, behavior: "smooth" });
   updateDots();
   x1 = null;
-}
-
-// Klik titik (dot)
-dots.forEach((dot, index) => {
-  dot.addEventListener("click", () => {
-    currentTab = index;
-    tabsContainer.scrollTo({
-      left: index * tabsContainer.offsetWidth,
-      behavior: "smooth",
-    });
-    updateDots();
-  });
 });
 
-// Sinkronisasi titik saat scroll manual
+dots.forEach((dot, i) => dot.addEventListener("click", () => {
+  currentTab = i;
+  tabsContainer.scrollTo({ left: i * tabsContainer.offsetWidth, behavior: "smooth" });
+  updateDots();
+}));
+
 tabsContainer.addEventListener("scroll", () => {
   const index = Math.round(tabsContainer.scrollLeft / tabsContainer.offsetWidth);
   if (index !== currentTab) {
     currentTab = index;
     updateDots();
+  }
+});
+
+// ===== Tema Terang / Gelap =====
+const themeToggle = document.getElementById("theme-toggle");
+let currentTheme = localStorage.getItem("theme") || "light";
+document.body.classList.add(currentTheme);
+themeToggle.textContent = currentTheme === "light" ? "🌙 Gelap" : "☀️ Terang";
+
+themeToggle.addEventListener("click", () => {
+  if (document.body.classList.contains("light")) {
+    document.body.classList.replace("light", "dark");
+    themeToggle.textContent = "☀️ Terang";
+    localStorage.setItem("theme", "dark");
+  } else {
+    document.body.classList.replace("dark", "light");
+    themeToggle.textContent = "🌙 Gelap";
+    localStorage.setItem("theme", "light");
   }
 });
