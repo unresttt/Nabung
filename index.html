@@ -34,19 +34,12 @@
       <p id="total">Rp 0</p>
     </div>
 
-    <div class="riwayat">
-  <h3>Riwayat Transaksi</h3>
-  <div class="filter-container">
-    <label for="filterRiwayat">Tampilkan:</label>
-    <select id="filterRiwayat">
-      <option value="all">Semua</option>
-      <option value="tabungan">Tabungan Tiap Ketemu</option>
-      <option value="denda">Denda</option>
-    </select>
+    <div class="history-card">
+      <h3>Riwayat Transaksi</h3>
+      <ul id="history-list"></ul>
+      <button id="reset-history" class="reset all">Hapus Riwayat</button>
+    </div>
   </div>
-  <div id="riwayatList"></div>
-  <button id="hapusRiwayat" class="reset">Hapus Riwayat</button>
-</div>
 
   <script src="app.js"></script>
 </body>
