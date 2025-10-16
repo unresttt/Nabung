@@ -185,3 +185,38 @@ button {
   background: linear-gradient(90deg, #00ff99, #00ccff);
   transition: width 0.5s ease;
 }
+
+/* ===== Swipe Tab System ===== */
+.tabs-container {
+  display: flex;
+  overflow: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  width: 100%;
+}
+
+.tab-page {
+  flex: 0 0 100%;
+  scroll-snap-align: center;
+  padding: 10px;
+  transition: transform 0.3s ease;
+}
+
+.tab-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  background: rgba(255,255,255,0.4);
+  border-radius: 50%;
+  transition: background 0.3s;
+}
+
+.dot.active {
+  background: white;
+  }
