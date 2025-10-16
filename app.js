@@ -1,4 +1,3 @@
-// ===== Variabel Dasar =====
 let tabungan = 0;
 let denda = 0;
 let riwayat = [];
@@ -57,6 +56,12 @@ document.getElementById("hapusRiwayat").addEventListener("click", () => {
   renderRiwayat();
 });
 
+document.getElementById("setTarget").addEventListener("click", () => {
+  const input = document.getElementById("targetInput").value;
+  target = parseInt(input) || 0;
+  updateDisplay();
+});
+
 // ===== Riwayat =====
 function addRiwayat(amount, type) {
   const now = new Date();
@@ -72,13 +77,6 @@ function renderRiwayat() {
   updateDisplay();
 }
 
-// ===== Target Tabungan =====
-document.getElementById("setTarget").addEventListener("click", () => {
-  const input = document.getElementById("targetInput").value;
-  target = parseInt(input) || 0;
-  updateDisplay();
-});
-
 // ===== Swipe Tabs =====
 const tabsContainer = document.getElementById("tabsContainer");
 const dots = document.querySelectorAll(".dot");
@@ -88,16 +86,25 @@ function updateDots() {
   dots.forEach((d, i) => d.classList.toggle("active", i === currentTab));
 }
 
-let startX = null;
-tabsContainer.addEventListener("touchstart", e => (startX = e.touches[0].clientX));
-tabsContainer.addEventListener("touchmove", e => {
-  if (!startX) return;
-  const diff = startX - e.touches[0].clientX;
-  if (diff > 50 && currentTab < 2) currentTab++;
-  else if (diff < -50 && currentTab > 0) currentTab--;
+let startX = 0;
+let isDragging = false;
+
+tabsContainer.addEventListener("touchstart", e => {
+  startX = e.touches[0].clientX;
+  isDragging = true;
+});
+
+tabsContainer.addEventListener("touchend", e => {
+  if (!isDragging) return;
+  const endX = e.changedTouches[0].clientX;
+  const diff = startX - endX;
+  if (Math.abs(diff) > 50) {
+    if (diff > 0 && currentTab < 2) currentTab++; // geser kiri → tab berikut
+    if (diff < 0 && currentTab > 0) currentTab--; // geser kanan → tab sebelumnya
+  }
   tabsContainer.scrollTo({ left: currentTab * tabsContainer.offsetWidth, behavior: "smooth" });
   updateDots();
-  startX = null;
+  isDragging = false;
 });
 
 dots.forEach((dot, i) =>
@@ -126,5 +133,4 @@ themeToggle.addEventListener("click", () => {
   }
 });
 
-// Jalankan awal
 updateDisplay();
