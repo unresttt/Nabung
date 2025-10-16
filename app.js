@@ -159,7 +159,7 @@ setTargetBtn.addEventListener("click", () => {
 // Jalankan awal
 updateDisplay();
 
-// ====== Swipe Tabs ======
+// ====== Swipe Tabs (final versi) ======
 const tabsContainer = document.getElementById("tabsContainer");
 const dots = document.querySelectorAll(".dot");
 let currentTab = 0;
@@ -170,6 +170,7 @@ function updateDots() {
   });
 }
 
+// Swipe manual
 tabsContainer.addEventListener("touchstart", handleTouchStart, false);
 tabsContainer.addEventListener("touchmove", handleTouchMove, false);
 
@@ -186,16 +187,32 @@ function handleTouchMove(e) {
   if (diff > 50 && currentTab < 2) currentTab++; // geser kiri
   else if (diff < -50 && currentTab > 0) currentTab--; // geser kanan
 
-  tabsContainer.style.transform = `translateX(-${currentTab * 100}%)`;
+  tabsContainer.scrollTo({
+    left: currentTab * tabsContainer.offsetWidth,
+    behavior: "smooth",
+  });
+
   updateDots();
   x1 = null;
 }
 
-// Klik dot juga bisa pindah tab
+// Klik titik (dot)
 dots.forEach((dot, index) => {
   dot.addEventListener("click", () => {
     currentTab = index;
-    tabsContainer.style.transform = `translateX(-${index * 100}%)`;
+    tabsContainer.scrollTo({
+      left: index * tabsContainer.offsetWidth,
+      behavior: "smooth",
+    });
     updateDots();
   });
+});
+
+// Sinkronisasi titik saat scroll manual
+tabsContainer.addEventListener("scroll", () => {
+  const index = Math.round(tabsContainer.scrollLeft / tabsContainer.offsetWidth);
+  if (index !== currentTab) {
+    currentTab = index;
+    updateDots();
+  }
 });
