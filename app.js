@@ -1,14 +1,14 @@
 let tabungan = 0;
 let denda = 0;
-let riwayat = [];
+let riwayat = JSON.parse(localStorage.getItem("riwayat")) || [];
 let targets = JSON.parse(localStorage.getItem("targets")) || [];
 
-// ===== Format Uang =====
+// Format Rupiah
 function formatRupiah(num) {
   return "Rp " + num.toLocaleString("id-ID");
 }
 
-// ===== Update Display =====
+// Update Tampilan
 function updateDisplay() {
   document.getElementById("tabunganDisplay").textContent = formatRupiah(tabungan);
   document.getElementById("dendaDisplay").textContent = formatRupiah(denda);
@@ -18,13 +18,13 @@ function updateDisplay() {
   saveData();
 }
 
-// ===== Simpan ke LocalStorage =====
+// Simpan Data
 function saveData() {
   localStorage.setItem("targets", JSON.stringify(targets));
   localStorage.setItem("riwayat", JSON.stringify(riwayat));
 }
 
-// ===== Render Riwayat =====
+// Render Riwayat
 function renderRiwayat() {
   const list = document.getElementById("riwayatList");
   if (riwayat.length === 0) {
@@ -34,7 +34,7 @@ function renderRiwayat() {
   }
 }
 
-// ===== Tambah Riwayat =====
+// Tambah Riwayat
 function addRiwayat(amount, type) {
   const waktu = new Date().toLocaleString("id-ID", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "short" });
   riwayat.unshift(`[${waktu}] +${formatRupiah(amount)} (${type})`);
@@ -79,6 +79,7 @@ function renderTargets() {
       <p>Tersimpan: ${formatRupiah(t.saved)}</p>
       <div class="progress-bar"><div class="progress" style="width:${progress}%"></div></div>
       <button class="tabung" onclick="tabungTarget(${index})">+${formatRupiah(t.step)}</button>
+      <button class="edit" onclick="editTarget(${index})">✏️ Edit</button>
       <button class="reset" onclick="hapusTarget(${index})">Hapus</button>
     `;
     container.appendChild(div);
@@ -98,18 +99,23 @@ function hapusTarget(i) {
   }
 }
 
-// ===== Tambah Target Baru =====
+function editTarget(i) {
+  const t = targets[i];
+  const name = prompt("Nama target:", t.name) || t.name;
+  const goal = parseInt(prompt("Nominal target (Rp):", t.goal)) || t.goal;
+  const step = parseInt(prompt("Nominal tabung per klik (Rp):", t.step)) || t.step;
+
+  targets[i] = { ...t, name, goal, step };
+  updateDisplay();
+}
+
+// Tambah Target
 document.getElementById("addTargetBtn").onclick = () => {
   const name = prompt("Nama target:");
   if (!name) return;
-
   const goal = parseInt(prompt("Nominal target (Rp):")) || 0;
   const step = parseInt(prompt("Nominal tabung per klik (Rp):")) || 0;
-
-  if (goal <= 0 || step <= 0) {
-    alert("Nominal tidak valid!");
-    return;
-  }
+  if (goal <= 0 || step <= 0) return alert("Nominal tidak valid!");
 
   targets.push({ name, goal, step, saved: 0 });
   updateDisplay();
@@ -171,5 +177,5 @@ themeToggle.onclick = () => {
   }
 };
 
-// ===== Jalankan Awal =====
+// Jalankan Awal
 updateDisplay();
