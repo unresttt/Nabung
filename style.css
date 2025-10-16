@@ -57,11 +57,11 @@ button {
   cursor: pointer;
   font-size: 1em;
   transition: 0.2s;
+  color: #fff;
 }
 
 button.tabung {
   background-color: #007bff;
-  color: white;
 }
 
 button.tabung:hover {
@@ -70,7 +70,6 @@ button.tabung:hover {
 
 button.reset {
   background-color: #dc3545;
-  color: white;
 }
 
 button.reset:hover {
@@ -120,10 +119,15 @@ input {
   color: #ffd700;
 }
 
+/* ✅ Swipe Tabs aktif */
 .tabs-container {
   display: flex;
-  overflow: hidden;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
 }
 
 .tab {
