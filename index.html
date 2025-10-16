@@ -2,79 +2,69 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Aplikasi Tabungan</title>
   <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="container">
+  <div class="app-container">
     <h1>💰 Aplikasi Tabungan</h1>
 
-    <!-- Tombol Mode Terang/Gelap -->
-    <button id="theme-toggle" class="theme-toggle">🌙 Gelap</button>
-
-    <!-- Wrapper untuk slide -->
-    <div class="tabs-container" id="tabsContainer">
-
-      <!-- === TAB 1 === -->
-      <section class="tab-page active">
+    <div class="tabs" id="tabsContainer">
+      <!-- TAB 1: Tabungan -->
+      <div class="tab">
         <div class="card">
           <h2>🤝 Tabungan Tiap Ketemu</h2>
-          <p id="tabungan">Rp 0</p>
-          <div class="actions">
-            <button id="btn-tabungan">Tabung +Rp5.000</button>
-            <button id="reset-tabungan" class="reset">Reset</button>
-          </div>
+          <p>Rp 5.000</p>
+          <button id="tabungKetemu">Tabung</button>
+          <button id="resetKetemu" class="reset-btn">Reset</button>
         </div>
 
         <div class="card">
           <h2>⚠️ Denda</h2>
-          <p id="denda">Rp 0</p>
-          <div class="actions">
-            <button id="btn-denda">Tabung +Rp50.000</button>
-            <button id="reset-denda" class="reset">Reset</button>
-          </div>
+          <p>Rp 50.000</p>
+          <button id="tabungDenda">Tabung</button>
+          <button id="resetDenda" class="reset-btn">Reset</button>
         </div>
 
-        <div class="total-card">
+        <div class="card total">
           <h3>Total Keseluruhan</h3>
-          <p id="total">Rp 0</p>
+          <p id="totalDisplay">Rp 0</p>
         </div>
-      </section>
+      </div>
 
-      <!-- === TAB 2 === -->
-      <section class="tab-page">
-        <div class="card target">
-          <h3>🎯 Target Tabungan</h3>
-          <div class="target-info">
-            <input type="number" id="input-target" placeholder="Masukkan target (Rp)" />
-            <button id="set-target">Set Target</button>
-          </div>
-          <p id="progress-text">Belum ada target</p>
+      <!-- TAB 2: Target Tabungan -->
+      <div class="tab">
+        <div class="card">
+          <h2>🎯 Target Tabungan</h2>
+          <input type="number" id="targetInput" placeholder="Masukkan target (Rp)" />
+          <button id="setTarget">Set Target</button>
+          <p id="progressText">Progress: Rp 0 / Rp 0 (0%)</p>
           <div class="progress-bar">
-            <div id="progress-fill"></div>
+            <div class="progress" id="progress"></div>
           </div>
         </div>
-      </section>
+      </div>
 
-      <!-- === TAB 3 === -->
-      <section class="tab-page">
-        <div class="history-card">
-          <h3>Riwayat Transaksi</h3>
-          <ul id="history-list"></ul>
-          <button id="reset-history" class="reset all">Hapus Riwayat</button>
+      <!-- TAB 3: Riwayat -->
+      <div class="tab">
+        <div class="card">
+          <h2>📜 Riwayat Transaksi</h2>
+          <ul id="riwayatList"></ul>
+          <button id="hapusRiwayat" class="reset-btn">Hapus Riwayat</button>
         </div>
-      </section>
+      </div>
     </div>
 
-    <!-- Indikator Tab -->
-    <div class="tab-dots">
+    <div class="dots">
       <span class="dot active"></span>
       <span class="dot"></span>
       <span class="dot"></span>
     </div>
   </div>
+
+  <!-- Tombol tema -->
+  <button id="theme-toggle" class="theme-toggle">🌙</button>
 
   <script src="app.js"></script>
 </body>
