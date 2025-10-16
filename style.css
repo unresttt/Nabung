@@ -146,3 +146,28 @@ button {
 .reset.all:hover {
   background: rgba(255,255,255,0.4);
 }
+
+.filter-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.filter-container label {
+  color: #fff;
+  font-weight: 500;
+}
+
+.filter-container select {
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: none;
+  background-color: #ffffff33;
+  color: #fff;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+    }
