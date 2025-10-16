@@ -6,54 +6,58 @@
   <title>Aplikasi Tabungan</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
-  <div class="app-container">
+<body class="light">
+  <div id="app">
     <h1>💰 Aplikasi Tabungan</h1>
 
-    <div class="tabs" id="tabsContainer">
-      <!-- TAB 1: Tabungan -->
-      <div class="tab">
-        <div class="card">
-          <h2>🤝 Tabungan Tiap Ketemu</h2>
-          <p>Rp 5.000</p>
-          <button id="tabungKetemu">Tabung</button>
-          <button id="resetKetemu" class="reset-btn">Reset</button>
-        </div>
-
-        <div class="card">
-          <h2>⚠️ Denda</h2>
-          <p>Rp 50.000</p>
-          <button id="tabungDenda">Tabung</button>
-          <button id="resetDenda" class="reset-btn">Reset</button>
-        </div>
-
-        <div class="card total">
-          <h3>Total Keseluruhan</h3>
-          <p id="totalDisplay">Rp 0</p>
-        </div>
-      </div>
-
-      <!-- TAB 2: Target Tabungan -->
-      <div class="tab">
+    <div id="tabsContainer" class="tabs-container">
+      <!-- ====== TAB 1 ====== -->
+      <section class="tab">
         <div class="card">
           <h2>🎯 Target Tabungan</h2>
           <input type="number" id="targetInput" placeholder="Masukkan target (Rp)" />
           <button id="setTarget">Set Target</button>
           <p id="progressText">Progress: Rp 0 / Rp 0 (0%)</p>
-          <div class="progress-bar">
-            <div class="progress" id="progress"></div>
+          <div class="progress-bar"><div id="progressFill"></div></div>
+        </div>
+      </section>
+
+      <!-- ====== TAB 2 ====== -->
+      <section class="tab">
+        <div class="card">
+          <h2>🤝 Tabungan Tiap Ketemu</h2>
+          <p id="tabunganDisplay">Rp 0</p>
+          <div class="buttons">
+            <button id="tabungBtnKetemu" class="tabung">Tabung +Rp5.000</button>
+            <button id="resetKetemu" class="reset">Reset</button>
           </div>
         </div>
-      </div>
 
-      <!-- TAB 3: Riwayat -->
-      <div class="tab">
+        <div class="card">
+          <h2>⚠️ Denda</h2>
+          <p id="dendaDisplay">Rp 0</p>
+          <div class="buttons">
+            <button id="tabungBtnDenda" class="tabung">Tabung +Rp50.000</button>
+            <button id="resetDenda" class="reset">Reset</button>
+          </div>
+        </div>
+
+        <div class="card total">
+          <h2>Total Keseluruhan</h2>
+          <p id="totalDisplay">Rp 0</p>
+        </div>
+      </section>
+
+      <!-- ====== TAB 3 ====== -->
+      <section class="tab">
         <div class="card">
           <h2>📜 Riwayat Transaksi</h2>
-          <ul id="riwayatList"></ul>
-          <button id="hapusRiwayat" class="reset-btn">Hapus Riwayat</button>
+          <ul id="riwayatList">
+            <li><em>Belum ada transaksi</em></li>
+          </ul>
+          <button id="hapusRiwayat" class="reset">Hapus Riwayat</button>
         </div>
-      </div>
+      </section>
     </div>
 
     <div class="dots">
@@ -61,10 +65,9 @@
       <span class="dot"></span>
       <span class="dot"></span>
     </div>
-  </div>
 
-  <!-- Tombol tema -->
-  <button id="theme-toggle" class="theme-toggle">🌙</button>
+    <button id="theme-toggle" class="theme-toggle">🌙</button>
+  </div>
 
   <script src="app.js"></script>
 </body>
