@@ -1,17 +1,13 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Aplikasi Tabungan</title>
 
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="icon-192.png" sizes="192x192" />
-  <link rel="stylesheet" href="style.css" />
-  <!-- Firebase SDK (modular) via CDN -->
-  <script type="module">
-    // initialize firebase used by app.js (app.js will import firebase modules)
-  </script>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon-192.png" sizes="192x192">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <main id="app">
@@ -20,14 +16,11 @@
       <h1>Aplikasi Tabungan</h1>
     </header>
 
-    <!-- Tabs container (full-screen tab style) -->
     <section id="tabs" class="tabs">
       <div class="tab" id="tab-targets">
         <h2>🎯 Daftar Target Tabungan</h2>
         <button id="btn-add-target" class="btn green">+ Tambah Target</button>
-        <div id="targets-list" class="card-list">
-          <!-- target cards injected here -->
-        </div>
+        <div id="targets-list" class="card-list"></div>
       </div>
 
       <div class="tab" id="tab-meet">
@@ -57,28 +50,25 @@
         <h2>💵 Total Keseluruhan</h2>
         <div class="big-card">
           <p class="big-amount" id="total-amount">Rp 0</p>
-          <p class="muted">Total gabungan semua tabungan, target, dan denda</p>
+          <p class="muted">Total semua tabungan, target, dan denda</p>
         </div>
       </div>
 
       <div class="tab" id="tab-history">
         <h2>📜 Riwayat Transaksi</h2>
-        <ul id="transactions-list" class="tx-list">
-          <!-- transaksi inject -->
-        </ul>
+        <ul id="transactions-list" class="tx-list"></ul>
         <button id="clear-history" class="btn red">Hapus Riwayat</button>
       </div>
     </section>
 
-    <!-- pagination dots -->
     <nav id="dots" class="dots"></nav>
 
-    <!-- add/edit target modal (simple) -->
+    <!-- Modal Target -->
     <div id="modal" class="modal hidden">
       <div class="modal-card">
         <h3 id="modal-title">Tambah Target</h3>
-        <input id="target-name" placeholder="Nama target (contoh: Beli Helm)" />
-        <input id="target-amount" placeholder="Target (angka, tanpa . atau Rp)" inputmode="numeric"/>
+        <input id="target-name" placeholder="Nama target" />
+        <input id="target-amount" placeholder="Nominal target" inputmode="numeric" />
         <div class="modal-actions">
           <button id="modal-cancel" class="btn muted">Batal</button>
           <button id="modal-save" class="btn green">Simpan</button>
@@ -89,7 +79,11 @@
     <button id="toggle-theme" class="fab">🌙</button>
   </main>
 
-  <script nomodule src="app-legacy.js"></script>
-  <script>
+  <!-- Firebase SDK (compat version) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+  <!-- File utama -->
+  <script src="app-legacy.js"></script>
 </body>
 </html>
