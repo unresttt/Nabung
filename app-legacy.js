@@ -193,3 +193,34 @@ function init() {
   updateDisplay();
 }
 init();
+
+// === SISTEM SWIPE ANTAR TAB ===
+let startX = 0;
+let currentTab = 0;
+const tabs = document.querySelectorAll('.tab');
+const dots = document.querySelectorAll('.dot');
+
+function showTab(index) {
+  if (index < 0) index = tabs.length - 1;
+  if (index >= tabs.length) index = 0;
+  tabs.forEach((tab, i) => {
+    tab.style.transform = `translateX(${100 * (i - index)}%)`;
+  });
+  dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
+  currentTab = index;
+}
+
+document.querySelector('#tabs').addEventListener('touchstart', e => {
+  startX = e.touches[0].clientX;
+});
+
+document.querySelector('#tabs').addEventListener('touchend', e => {
+  const endX = e.changedTouches[0].clientX;
+  const diff = startX - endX;
+  if (Math.abs(diff) > 50) {
+    showTab(currentTab + (diff > 0 ? 1 : -1));
+  }
+});
+
+// Inisialisasi posisi tab
+showTab(0);
