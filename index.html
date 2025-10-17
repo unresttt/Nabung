@@ -6,19 +6,7 @@
   <title>Aplikasi Tabungan</title>
 
   <script>
-    // Buat versi unik berdasar waktu (anti-cache)
-    const now = new Date();
-    const app_version =
-      now.getFullYear().toString() +
-      (now.getMonth() + 1).toString().padStart(2, "0") +
-      now.getDate().toString().padStart(2, "0") +
-      "-" +
-      now.getHours().toString().padStart(2, "0") +
-      now.getMinutes().toString().padStart(2, "0") +
-      now.getSeconds().toString().padStart(2, "0");
-    console.log("Aplikasi Tabungan v" + app_version);
-
-    // Fungsi untuk menulis elemen dengan versi unik
+    const app_version = "v20251017.1";
     document.write(`
       <link rel="manifest" href="manifest.json?v=${app_version}">
       <link rel="icon" href="icon-192.png" sizes="192x192">
@@ -30,22 +18,19 @@
 <body>
   <main id="app">
     <header class="app-header">
-      <div class="logo">💰</div>
+      <img src="icon-192.png" alt="logo" class="logo">
       <h1>Aplikasi Tabungan</h1>
     </header>
 
     <section id="tabs" class="tabs">
-      <!-- TAB TARGET -->
       <div class="tab" id="tab-targets">
         <h2>🎯 Daftar Target Tabungan</h2>
         <button id="btn-add-target" class="btn green">+ Tambah Target</button>
         <div id="targets-list" class="card-list"></div>
       </div>
 
-      <!-- TAB TIAP KETEMU / DENDA -->
       <div class="tab" id="tab-meet">
         <h2>🤝 Tabungan Tiap Ketemu & ⚠️ Denda</h2>
-
         <div class="card">
           <h3>Tabungan Tiap Ketemu</h3>
           <p class="amount" id="meet-amount">Rp 0</p>
@@ -67,7 +52,6 @@
         </div>
       </div>
 
-      <!-- TAB TOTAL -->
       <div class="tab" id="tab-total">
         <h2>💵 Total Keseluruhan</h2>
         <div class="big-card">
@@ -76,7 +60,6 @@
         </div>
       </div>
 
-      <!-- TAB RIWAYAT -->
       <div class="tab" id="tab-history">
         <h2>📜 Riwayat Transaksi</h2>
         <ul id="transactions-list" class="tx-list"></ul>
@@ -86,7 +69,6 @@
 
     <nav id="dots" class="dots"></nav>
 
-    <!-- Modal Target -->
     <div id="modal" class="modal hidden">
       <div class="modal-card">
         <h3 id="modal-title">Tambah Target</h3>
@@ -102,11 +84,8 @@
     <button id="toggle-theme" class="fab">🌙</button>
   </main>
 
-  <!-- Firebase SDK (compat) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-
-  <!-- File utama (pakai versi unik biar selalu terbaru) -->
   <script>
     document.write(`<script src="app-legacy.js?v=${app_version}"><\\/script>`);
   </script>
