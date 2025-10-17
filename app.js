@@ -1,13 +1,9 @@
-// app.js (type=module expected)
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-import {
-  getDatabase, ref, onValue, set, push, update, remove, child, get
-} from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+// app.js (type=module)
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+import { getDatabase, ref, onValue, set, push, update, remove } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
 
-/* ============ Firebase config =============
-   (pakai config yang kamu share sebelumnya)
-   Jika mau ganti project -> edit object dibawah
-===========================================*/
+/* ---------- FIREBASE CONFIG: pakai config projectmu ---------- */
+/* kamu sebelumnya share config — aku pakai config yang sama */
 const firebaseConfig = {
   apiKey: "AIzaSyC7boFrn964XUBRZf0xdyjqst3bsk_s_AE",
   authDomain: "tabungan-kita-a2b49.firebaseapp.com",
@@ -18,297 +14,292 @@ const firebaseConfig = {
   appId: "1:203588830235:web:b3d7adb92b0647953264be",
   measurementId: "G-7D99H7QWHK"
 };
-
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-/* --- DB paths used:
-   /targets  -> object of targets
-   /tiap     -> value number (tabungan tiap ketemu)
-   /denda    -> value number
-   /history  -> push items (timestamp, message)
-*/
+/* ---------- DATABASE ROOT we agreed: 'digambar' ---------- */
+const ROOT = 'digambar'; // IMPORTANT: jangan ganti kecuali DB node lain
 
-/* ---------- Helpers ---------- */
-const cents = n => Number(n) || 0;
-const fmt = (n) => {
-  const num = cents(n);
-  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num);
+/* paths */
+const paths = {
+  meet: `${ROOT}/meet`,             // tabungan tiap ketemu
+  penalty: `${ROOT}/penalty`,       // denda
+  targets: `${ROOT}/targets`,       // map of targets
+  tx: `${ROOT}/transactions`        // history
 };
-const el = id => document.getElementById(id);
 
 /* ---------- UI refs ---------- */
-const targetsList = el('targets-list');
-const addTargetBtn = el('add-target-btn');
-const tiapValEl = el('tiap-value');
-const dendaValEl = el('denda-value');
-const tiapAddBtn = el('tiap-add');
-const tiapResetBtn = el('tiap-reset');
-const dendaAddBtn = el('denda-add');
-const dendaResetBtn = el('denda-reset');
-const totalValueEl = el('total-value');
-const historyList = el('history-list');
-const clearHistoryBtn = el('clear-history');
-const installBtn = el('install-btn');
+const tabs = document.querySelector('#tabs');
+const dots = document.querySelector('#dots');
+const tabEls = document.querySelectorAll('.tab');
 
-/* ---------- Tabs swipe UI ---------- */
-const tabsEl = document.getElementById('tabs');
-const slides = Array.from(document.querySelectorAll('.slide'));
-const dotsContainer = document.getElementById('dots');
 let currentIndex = 0;
-const makeDots = () => {
-  dotsContainer.innerHTML = '';
-  slides.forEach((s, i) => {
-    const b = document.createElement('button');
-    b.addEventListener('click', () => goTo(i));
-    if (i === 0) b.classList.add('active');
-    dotsContainer.appendChild(b);
-  });
+const setTab = (i) => {
+  currentIndex = i;
+  tabs.style.transform = `translateX(-${i*100}%)`;
+  document.querySelectorAll('.dot').forEach((d,idx)=>d.classList.toggle('active', idx===i));
 };
-makeDots();
-const refreshDots = () => {
-  Array.from(dotsContainer.children).forEach((b, i) => {
-    b.classList.toggle('active', i === currentIndex);
-  });
-};
-function goTo(i){
-  currentIndex = Math.max(0, Math.min(i, slides.length-1));
-  tabsEl.style.transform = `translateX(-${currentIndex * 100}%)`;
-  refreshDots();
-}
-/* Touch / swipe */
-let startX = 0, deltaX = 0, isTouch = false;
-tabsEl.addEventListener('touchstart', e => {
-  isTouch = true;
-  startX = e.touches[0].clientX;
-});
-tabsEl.addEventListener('touchmove', e => {
-  if(!isTouch) return;
-  deltaX = e.touches[0].clientX - startX;
-  tabsEl.style.transition = 'none';
-  tabsEl.style.transform = `translateX(${ -currentIndex*100 + (deltaX / window.innerWidth * 100)}%)`;
-});
-tabsEl.addEventListener('touchend', e => {
-  isTouch = false;
-  tabsEl.style.transition = '';
-  if (Math.abs(deltaX) > 50) {
-    if (deltaX < 0) goTo(currentIndex + 1);
-    else goTo(currentIndex - 1);
-  } else {
-    goTo(currentIndex);
+function buildDots(){
+  dots.innerHTML = '';
+  for(let i=0;i<tabEls.length;i++){
+    const el = document.createElement('div');
+    el.className='dot'+(i===0?' active':'');
+    el.addEventListener('click', ()=> setTab(i));
+    dots.appendChild(el);
   }
-  deltaX = 0;
+}
+buildDots();
+
+/* swipe support */
+let startX=0, endX=0;
+tabs.addEventListener('touchstart', e=>{ startX = e.touches[0].clientX; });
+tabs.addEventListener('touchmove', e=>{ endX = e.touches[0].clientX; });
+tabs.addEventListener('touchend', e=>{
+  const diff = endX - startX;
+  if(Math.abs(diff) < 30) return;
+  if(diff < 0 && currentIndex < tabEls.length-1) setTab(currentIndex+1);
+  if(diff > 0 && currentIndex > 0) setTab(currentIndex-1);
 });
 
-/* ---------- DB listeners ---------- */
-const targetsRef = ref(db, 'targets');
-const tiapRef = ref(db, 'tiap');
-const dendaRef = ref(db, 'denda');
-const historyRef = ref(db, 'history');
+/* ---------- UI elements for features ---------- */
+/* targets */
+const targetsList = document.getElementById('targets-list');
+const btnAddTarget = document.getElementById('btn-add-target');
+const modal = document.getElementById('modal');
+const modalTitle = document.getElementById('modal-title');
+const targetNameInput = document.getElementById('target-name');
+const targetAmountInput = document.getElementById('target-amount');
+const modalCancel = document.getElementById('modal-cancel');
+const modalSave = document.getElementById('modal-save');
 
-function pushHistory(msg){
-  const h = push(ref(db, 'history'));
-  set(h, { ts: Date.now(), text: msg });
+let editTargetId = null;
+
+btnAddTarget.addEventListener('click', ()=>{
+  modalTitle.textContent='Tambah Target';
+  targetNameInput.value='';
+  targetAmountInput.value='';
+  editTargetId = null;
+  modal.classList.remove('hidden');
+});
+modalCancel.addEventListener('click', ()=> modal.classList.add('hidden'));
+
+modalSave.addEventListener('click', async ()=>{
+  const name = (targetNameInput.value || '').trim();
+  const amount = parseInt((targetAmountInput.value||'0').replace(/\D/g,''),10) || 0;
+  if(!name || amount<=0) {
+    alert('Nama target dan jumlah target harus diisi (angka > 0)');
+    return;
+  }
+  if(editTargetId){
+    // update target
+    await update(ref(db, `${paths.targets}/${editTargetId}`), { name, target: amount });
+  } else {
+    // push new
+    const newRef = push(ref(db, paths.targets));
+    await set(newRef, { name, target: amount, saved: 0 });
+  }
+  modal.classList.add('hidden');
+});
+
+/* meet & penalty controls */
+const meetAmountEl = document.getElementById('meet-amount');
+const penaltyAmountEl = document.getElementById('penalty-amount');
+const meetAddBtn = document.getElementById('meet-add');
+const meetResetBtn = document.getElementById('meet-reset');
+const penaltyAddBtn = document.getElementById('penalty-add');
+const penaltyResetBtn = document.getElementById('penalty-reset');
+
+meetAddBtn.addEventListener('click', ()=> modifySimpleAmount('meet', 1)); // one step
+penaltyAddBtn.addEventListener('click', ()=> modifySimpleAmount('penalty', 1));
+meetResetBtn.addEventListener('click', ()=> set(ref(db, paths.meet), 0));
+penaltyResetBtn.addEventListener('click', ()=> set(ref(db, paths.penalty), 0));
+
+/* step amounts (you can change step sizes here) */
+const STEP_MEET = 5000; // Rp 5.000 default per click
+const STEP_PENALTY = 50000; // Rp 50.000 default
+
+async function modifySimpleAmount(kind, times=1){
+  const path = kind==='meet' ? paths.meet : paths.penalty;
+  const step = kind==='meet' ? STEP_MEET : STEP_PENALTY;
+  const add = step * times;
+  // read current, then update using set (atomic not used; for simple app it's okay)
+  const snapshotRef = ref(db, path);
+  onValue(snapshotRef, snap=>{
+    const cur = Number(snap.val() || 0);
+    // set updated value
+    set(ref(db, path), cur + add);
+    // push to transactions
+    push(ref(db, paths.tx), {
+      ts: Date.now(),
+      human: new Date().toLocaleString(),
+      amount: add,
+      type: kind === 'meet' ? 'Tabungan Tiap Ketemu' : 'Denda'
+    });
+  }, { onlyOnce:true });
 }
 
-/* listen targets */
-onValue(targetsRef, snap => {
+/* total */
+const totalAmountEl = document.getElementById('total-amount');
+
+/* transactions */
+const txListEl = document.getElementById('transactions-list');
+const clearHistoryBtn = document.getElementById('clear-history');
+clearHistoryBtn.addEventListener('click', ()=> {
+  if(confirm('Hapus semua riwayat transaksi?')) remove(ref(db, paths.tx));
+});
+
+/* realtime listeners */
+onValue(ref(db, paths.meet), snap=>{
+  const val = Number(snap.val()||0);
+  meetAmountEl.textContent = formatRp(val);
+  calcTotalUI();
+});
+onValue(ref(db, paths.penalty), snap=>{
+  const val = Number(snap.val()||0);
+  penaltyAmountEl.textContent = formatRp(val);
+  calcTotalUI();
+});
+
+/* targets listener */
+onValue(ref(db, paths.targets), snap=>{
   const data = snap.val() || {};
   renderTargets(data);
-  recalcTotal(data);
+  calcTotalUI();
 });
 
-/* listen tiap & denda */
-onValue(tiapRef, snap => {
-  const v = snap.val() || 0;
-  tiapValEl.textContent = fmt(v);
-  recalcTotal();
-});
-onValue(dendaRef, snap => {
-  const v = snap.val() || 0;
-  dendaValEl.textContent = fmt(v);
-  recalcTotal();
-});
-
-/* listen history */
-onValue(historyRef, snap => {
+/* transactions listener */
+onValue(ref(db, paths.tx), snap=>{
   const data = snap.val() || {};
-  renderHistory(data);
+  renderTransactions(data);
 });
 
-/* ---------- UI render functions ---------- */
-function renderTargets(targets){
+/* render helpers */
+function renderTargets(map){
   targetsList.innerHTML = '';
-  const keys = Object.keys(targets).sort((a,b) => (targets[b].created||0) - (targets[a].created||0));
-  if (keys.length === 0){
-    const none = document.createElement('div');
-    none.className = 'target-item';
-    none.textContent = 'Belum ada target';
-    targetsList.appendChild(none);
+  const entries = Object.entries(map);
+  if(entries.length===0){
+    const el = document.createElement('div');
+    el.className='card';
+    el.textContent='Belum ada target';
+    targetsList.appendChild(el);
     return;
   }
-  keys.forEach(k => {
-    const t = targets[k];
-    const item = document.createElement('div');
-    item.className = 'target-item';
-    const header = document.createElement('div'); header.className='target-header';
-    const name = document.createElement('div'); name.className='target-name'; name.textContent = t.name || 'Target';
-    const del = document.createElement('button'); del.className='btn btn-danger'; del.textContent='Hapus';
-    del.onclick = async () => {
-      if(!confirm(`Hapus target "${t.name}"?`)) return;
-      await remove(child(targetsRef, k));
-      pushHistory(`[${timeLabel()}] Hapus target "${t.name}"`);
-    };
-    header.appendChild(name); header.appendChild(del);
+  entries.forEach(([id, t])=>{
+    const card = document.createElement('div');
+    card.className='card';
+    const title = document.createElement('h3');
+    title.textContent = t.name || '—';
+    const info = document.createElement('p');
+    info.className='amount';
+    info.textContent = `Target: ${formatRp(t.target||0)}  •  Tersimpan: ${formatRp(t.saved||0)}`;
+    // progress bar simplified
+    const progressBar = document.createElement('div');
+    progressBar.style.height='8px';
+    progressBar.style.borderRadius='8px';
+    progressBar.style.background='rgba(255,255,255,.06)';
+    progressBar.style.margin='8px 0';
+    const inner = document.createElement('div');
+    inner.style.height='100%';
+    const per = t.target ? Math.min(100, Math.round(((t.saved||0)/t.target)*100)) : 0;
+    inner.style.width = per + '%';
+    inner.style.background = 'linear-gradient(90deg,#1be1c0,#1e90ff)';
+    inner.style.borderRadius='8px';
+    progressBar.appendChild(inner);
 
-    const info = document.createElement('div'); info.className='target-info';
-    info.innerHTML = `Target: ${fmt(t.target||0)}<br>Tersimpan: ${fmt(t.saved||0)}`;
+    const controls = document.createElement('div');
+    controls.className='controls';
+    const addBtn = document.createElement('button');
+    addBtn.className='btn blue';
+    addBtn.textContent = '+Rp 10.000';
+    addBtn.addEventListener('click', async ()=>{
+      const step=10000;
+      const curSaved = Number(t.saved || 0);
+      await update(ref(db, `${paths.targets}/${id}`), { saved: curSaved + step });
+      // push transaction
+      push(ref(db, paths.tx), { ts: Date.now(), human: new Date().toLocaleString(), amount: step, type: `ke target "${t.name}"` });
+    });
 
-    const progressOuter = document.createElement('div'); progressOuter.className='progress-outer';
-    const progressInner = document.createElement('div'); progressInner.className='progress-inner';
-    const pct = t.target ? Math.min(100, Math.round(((t.saved||0)/t.target)*100)) : 0;
-    progressInner.style.width = pct + '%';
-    progressOuter.appendChild(progressInner);
+    const editBtn = document.createElement('button');
+    editBtn.className='btn yellow';
+    editBtn.textContent = 'Mengatur ulang';
+    editBtn.addEventListener('click', ()=>{
+      editTargetId = id;
+      modalTitle.textContent='Edit Target';
+      targetNameInput.value = t.name || '';
+      targetAmountInput.value = (t.target || 0);
+      modal.classList.remove('hidden');
+    });
 
-    const row = document.createElement('div'); row.style.display='flex'; row.style.gap='10px'; row.style.marginTop='8px';
-    const tabungBtn = document.createElement('button'); tabungBtn.className='btn btn-primary'; tabungBtn.textContent = `+Rp ${formatNumber(t.step || 1000)}`;
-    tabungBtn.onclick = async () => {
-      const increment = Number(t.step) || 0;
-      const updates = {};
-      updates[`/targets/${k}/saved`] = (t.saved || 0) + increment;
-      await update(ref(db), updates);
-      pushHistory(`[${timeLabel()}] +Rp ${formatNumber(increment)} ke target "${t.name}"`);
-    };
-    const editBtn = document.createElement('button'); editBtn.className='btn btn-warning'; editBtn.textContent='Mengatur ulang';
-    editBtn.onclick = async () => {
-      const newTarget = prompt('Masukkan target (angka tanpa titik):', t.target || 0);
-      if (newTarget === null) return;
-      const newStep = prompt('Masukkan step tabungan default (contoh 10000):', t.step || 1000);
-      await update(child(targetsRef, k), { target: Number(newTarget)||0, step: Number(newStep)||0 });
-      pushHistory(`[${timeLabel()}] Edit target "${t.name}"`);
-    };
+    const delBtn = document.createElement('button');
+    delBtn.className='btn red';
+    delBtn.textContent = 'Hapus';
+    delBtn.addEventListener('click', ()=> {
+      if(confirm('Hapus target ini?')) {
+        remove(ref(db, `${paths.targets}/${id}`));
+        push(ref(db, paths.tx), { ts: Date.now(), human: new Date().toLocaleString(), amount: 0, type: `Hapus target "${t.name}"` });
+      }
+    });
 
-    row.appendChild(tabungBtn);
-    row.appendChild(editBtn);
-
-    item.appendChild(header);
-    item.appendChild(info);
-    item.appendChild(progressOuter);
-    item.appendChild(row);
-
-    targetsList.appendChild(item);
+    controls.append(addBtn, editBtn, delBtn);
+    card.append(title, info, progressBar, controls);
+    targetsList.appendChild(card);
   });
 }
 
-/* history render */
-function renderHistory(data){
-  const arr = Object.entries(data || {}).sort((a,b)=> b[1].ts - a[1].ts);
-  historyList.innerHTML = '';
-  if (arr.length === 0){
-    const li = document.createElement('li'); li.textContent = 'Belum ada transaksi'; historyList.appendChild(li);
-    return;
-  }
-  arr.forEach(([k,v]) => {
+/* render transactions */
+function renderTransactions(map){
+  txListEl.innerHTML = '';
+  const entries = Object.entries(map || {}).sort((a,b)=> b[1].ts - a[1].ts);
+  entries.forEach(([_, tx])=>{
     const li = document.createElement('li');
-    li.textContent = `[${timeLabel(v.ts)}] ${v.text}`;
-    historyList.appendChild(li);
+    li.textContent = `[${tx.human}] ${tx.amount>=0 ? '+' : ''}${formatRp(tx.amount)} ${tx.type ? tx.type : ''}`;
+    txListEl.appendChild(li);
   });
 }
 
-/* --- calc total */
-async function recalcTotal(targetsData){
-  // read current tiap/denda if not provided
-  if (!targetsData){
-    const tSnap = await get(targetsRef);
-    targetsData = tSnap.val() || {};
+/* calculate total */
+async function calcTotalUI(){
+  // read latest values (onValue callbacks keep things updated)
+  const meetVal = Number((await getOnce(paths.meet)) || 0);
+  const penaltyVal = Number((await getOnce(paths.penalty)) || 0);
+
+  // sum targets saved
+  const targetsSnap = await getOnceObj(paths.targets);
+  let sumTargetsSaved = 0;
+  for(const id in targetsSnap){
+    sumTargetsSaved += Number(targetsSnap[id].saved || 0);
   }
-  let totalTargets = 0;
-  Object.values(targetsData).forEach(t => totalTargets += (t.saved||0));
-  // get tiap/denda from DB
-  const tiapSnap = await get(tiapRef);
-  const dendaSnap = await get(dendaRef);
-  const tiapVal = tiapSnap.val() || 0;
-  const dendaVal = dendaSnap.val() || 0;
-  const total = totalTargets + Number(tiapVal) + Number(dendaVal);
-  totalValueEl.textContent = fmt(total);
+  const total = meetVal + penaltyVal + sumTargetsSaved;
+  totalAmountEl.textContent = formatRp(total);
 }
 
-/* ---------- small utilities ---------- */
-function timeLabel(ts = Date.now()){
-  const d = new Date(ts);
-  const date = d.toLocaleDateString('id-ID', { day:'2-digit', month:'short', year:'numeric' });
-  const time = d.toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
-  return `${date} ${time}`;
+/* helper to read once */
+function getOnce(path){
+  return new Promise((res)=>{
+    onValue(ref(db, path), snap=>{
+      res(snap.val());
+    }, { onlyOnce:true });
+  });
 }
-function formatNumber(n){ return new Intl.NumberFormat('id-ID', { maximumFractionDigits:0 }).format(Number(n)||0); }
+function getOnceObj(path){
+  return new Promise((res)=>{
+    onValue(ref(db, path), snap=>{
+      res(snap.val() || {});
+    }, { onlyOnce:true });
+  });
+}
 
-/* ---------- actions ---------- */
-addTargetBtn.addEventListener('click', async () => {
-  const name = prompt('Nama target (contoh: Beli Helm):', '');
-  if (!name) return;
-  const target = Number(prompt('Masukkan nilai target (angka tanpa pemisah):', '100000')) || 0;
-  const step = Number(prompt('Step tabungan default (contoh 10000):', '10000')) || 0;
-  const p = push(targetsRef);
-  await set(p, { name, target, saved: 0, step, created: Date.now() });
-  pushHistory(`[${timeLabel()}] Tambah target "${name}"`);
-});
+/* helpers */
+function formatRp(num){
+  if(!num) return 'Rp 0';
+  const s = Number(num).toLocaleString('id-ID');
+  return `Rp ${s}`;
+}
 
-/* tiap/denda control */
-tiapAddBtn.addEventListener('click', async () => {
-  const defaultStep = 5000;
-  const increment = Number(prompt('Masukkan nominal tambah Tabungan Tiap Ketemu:', defaultStep)) || 0;
-  const snap = await get(tiapRef);
-  const now = (snap.val()||0) + increment;
-  await set(tiapRef, now);
-  pushHistory(`[${timeLabel()}] +Rp ${formatNumber(increment)} (Tabungan Tiap Ketemu)`);
+/* simple initializations */
+document.querySelectorAll('.hidden').forEach(n=>n.classList.remove('hidden')); // show if any were auto-hidden
+// theme toggle
+const themeBtn = document.getElementById('toggle-theme');
+themeBtn.addEventListener('click', ()=> {
+  document.body.classList.toggle('light');
 });
-tiapResetBtn.addEventListener('click', async () => {
-  if (!confirm('Reset Tabungan Tiap Ketemu ke 0?')) return;
-  await set(tiapRef, 0);
-  pushHistory(`[${timeLabel()}] Reset Tabungan Tiap Ketemu`);
-});
-dendaAddBtn.addEventListener('click', async () => {
-  const increment = Number(prompt('Masukkan nominal tambah Denda:', 50000)) || 0;
-  const snap = await get(dendaRef);
-  const now = (snap.val()||0) + increment;
-  await set(dendaRef, now);
-  pushHistory(`[${timeLabel()}] +Rp ${formatNumber(increment)} (Denda)`);
-});
-dendaResetBtn.addEventListener('click', async () => {
-  if (!confirm('Reset Denda ke 0?')) return;
-  await set(dendaRef, 0);
-  pushHistory(`[${timeLabel()}] Reset Denda`);
-});
-
-/* clear history */
-clearHistoryBtn.addEventListener('click', async () => {
-  if (!confirm('Hapus seluruh riwayat?')) return;
-  await set(historyRef, null);
-  pushHistory(`[${timeLabel()}] Hapus semua riwayat`);
-});
-
-/* install PWA prompt (optional) */
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  installBtn.style.display = 'block';
-});
-installBtn.addEventListener('click', async () => {
-  if (!deferredPrompt) return alert('Install tidak tersedia sekarang.');
-  deferredPrompt.prompt();
-  const { outcome } = await deferredPrompt.userChoice;
-  deferredPrompt = null;
-  installBtn.style.display = 'none';
-});
-
-/* initial goTo */
-goTo(0);
-
-/* make sure read initial data exist */
-(async function ensureInitial(){
-  const tiap = await get(tiapRef);
-  if (!tiap.exists()) await set(tiapRef, 0);
-  const denda = await get(dendaRef);
-  if (!denda.exists()) await set(dendaRef, 0);
-})();
