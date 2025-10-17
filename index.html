@@ -6,14 +6,19 @@
   <title>Aplikasi Tabungan</title>
 
   <script>
-    // === AUTO APP VERSION (berdasarkan tanggal + jam) ===
+    // Buat versi unik berdasar waktu (anti-cache)
     const now = new Date();
-    const app_version = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}-${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
-    console.log("App Version:", app_version);
-  </script>
+    const app_version =
+      now.getFullYear().toString() +
+      (now.getMonth() + 1).toString().padStart(2, "0") +
+      now.getDate().toString().padStart(2, "0") +
+      "-" +
+      now.getHours().toString().padStart(2, "0") +
+      now.getMinutes().toString().padStart(2, "0") +
+      now.getSeconds().toString().padStart(2, "0");
+    console.log("Aplikasi Tabungan v" + app_version);
 
-  <!-- Manifest dan Icon -->
-  <script>
+    // Fungsi untuk menulis elemen dengan versi unik
     document.write(`
       <link rel="manifest" href="manifest.json?v=${app_version}">
       <link rel="icon" href="icon-192.png" sizes="192x192">
@@ -30,14 +35,14 @@
     </header>
 
     <section id="tabs" class="tabs">
-      <!-- TAB 1: TARGET -->
+      <!-- TAB TARGET -->
       <div class="tab" id="tab-targets">
         <h2>🎯 Daftar Target Tabungan</h2>
         <button id="btn-add-target" class="btn green">+ Tambah Target</button>
         <div id="targets-list" class="card-list"></div>
       </div>
 
-      <!-- TAB 2: TIAP KETEMU / DENDA -->
+      <!-- TAB TIAP KETEMU / DENDA -->
       <div class="tab" id="tab-meet">
         <h2>🤝 Tabungan Tiap Ketemu & ⚠️ Denda</h2>
 
@@ -62,7 +67,7 @@
         </div>
       </div>
 
-      <!-- TAB 3: TOTAL -->
+      <!-- TAB TOTAL -->
       <div class="tab" id="tab-total">
         <h2>💵 Total Keseluruhan</h2>
         <div class="big-card">
@@ -71,7 +76,7 @@
         </div>
       </div>
 
-      <!-- TAB 4: RIWAYAT -->
+      <!-- TAB RIWAYAT -->
       <div class="tab" id="tab-history">
         <h2>📜 Riwayat Transaksi</h2>
         <ul id="transactions-list" class="tx-list"></ul>
@@ -94,7 +99,6 @@
       </div>
     </div>
 
-    <!-- Tombol Tema -->
     <button id="toggle-theme" class="fab">🌙</button>
   </main>
 
@@ -102,9 +106,9 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
-  <!-- Script utama (auto versioned) -->
+  <!-- File utama (pakai versi unik biar selalu terbaru) -->
   <script>
-    document.write(`<script src="app-legacy.js?v=${app_version}"><\/script>`);
+    document.write(`<script src="app-legacy.js?v=${app_version}"><\\/script>`);
   </script>
 </body>
 </html>
