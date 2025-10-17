@@ -1,12 +1,23 @@
 {
   "name": "Aplikasi Tabungan",
   "short_name": "Tabungan",
-  "start_url": "/",
+  "description": "Aplikasi tabungan sederhana dengan target, denda, dan tabungan tiap ketemu.",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#0b0e11",
-  "theme_color": "#0f1724",
+  "background_color": "#000000",
+  "theme_color": "#111111",
+  "orientation": "portrait-primary",
   "icons": [
-    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
   ]
 }
