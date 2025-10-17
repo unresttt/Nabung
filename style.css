@@ -198,3 +198,45 @@ html,body{
   .tab{ width:700px; margin:0 auto; }
   .tabs-inner{ justify-content:center; }
 }
+
+/* Tabs wrapper and slider */
+#tabs-wrapper {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  width: 100vw;
+  height: calc(100vh - 130px); /* isi tinggi layar dikurangi header */
+}
+
+.tabs-inner {
+  display: flex;
+  height: 100%;
+  width: 400vw; /* 4 tab = 400% */
+  transition: transform 300ms ease;
+  will-change: transform;
+}
+
+/* Setiap tab mengisi 1 layar penuh */
+.tab {
+  flex: 0 0 100vw;
+  height: 100%;
+  padding: 16px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+body, html {
+  overscroll-behavior: none;
+  touch-action: pan-y;
+}
+
+.tab h2 {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.card, .big-card {
+  margin: 10px auto;
+  max-width: 420px;
+}
