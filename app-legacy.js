@@ -1,226 +1,191 @@
-/* ================================
-   APP_VERSION = '2.1.0'
-   Aplikasi Tabungan Realtime
-   ================================ */
+// === APP VERSION ===
+const app_version = "20251017.2";
 
-// ====== Inisialisasi Firebase ======
-const firebaseConfig = {
-  apiKey: "AIzaSyC7boFrn964XUBRZf0xdyjqst3bsk_s_AE",
-  authDomain: "tabungan-kita-a2b49.firebaseapp.com",
-  databaseURL: "https://tabungan-kita-a2b49-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "tabungan-kita-a2b49",
-  storageBucket: "tabungan-kita-a2b49.appspot.com",
-  messagingSenderId: "203588830235",
-  appId: "1:203588830235:web:b3d7adb92b0647953264be"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-const refRoot = db.ref("sharedData");
+// === Inisialisasi Data ===
+let targets = JSON.parse(localStorage.getItem('targets') || '[]');
+let meet = parseInt(localStorage.getItem('meet') || '0');
+let penalty = parseInt(localStorage.getItem('penalty') || '0');
+let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
 
-// ====== Helper Function ======
-const byId = id => document.getElementById(id);
-const formatRupiah = n => "Rp " + n.toLocaleString("id-ID");
-const now = () => new Date().toLocaleString("id-ID", { hour12: false });
+// === Elemen DOM ===
+const targetsList = document.getElementById('targets-list');
+const meetAmount = document.getElementById('meet-amount');
+const penaltyAmount = document.getElementById('penalty-amount');
+const totalAmount = document.getElementById('total-amount');
+const txList = document.getElementById('transactions-list');
 
-// ====== Variabel Data ======
-let meet = 0, penalty = 0, targets = [], history = [];
-
-// ====== Ambil Data Realtime ======
-refRoot.on("value", snap => {
-  const data = snap.val();
-  if (!data) return;
-  meet = data.meet || 0;
-  penalty = data.penalty || 0;
-  targets = data.targets || [];
-  history = data.history || [];
-  updateDisplay();
-});
-
-// ====== Simpan ke Firebase ======
-function saveFirebase() {
-  refRoot.set({ meet, penalty, targets, history });
+// === Fungsi Utilitas ===
+function formatRupiah(num) {
+  return 'Rp ' + num.toLocaleString('id-ID');
+}
+function logTransaction(text) {
+  const time = new Date().toLocaleString('id-ID');
+  transactions.unshift(`[${time}] ${text}`);
+  localStorage.setItem('transactions', JSON.stringify(transactions));
+  renderTransactions();
 }
 
-// ====== Update Tampilan ======
-function updateDisplay() {
-  byId("meet-amount").textContent = formatRupiah(meet);
-  byId("penalty-amount").textContent = formatRupiah(penalty);
-  byId("total-amount").textContent = formatRupiah(meet + penalty + totalTarget());
-  renderTargets();
-  renderHistory();
-}
-
-// ====== Target Tabungan ======
-function totalTarget() {
-  return targets.reduce((sum, t) => sum + (parseInt(t.amount) || 0), 0);
-}
+// === Render Data ===
 function renderTargets() {
-  const list = byId("targets-list");
-  list.innerHTML = "";
-  if (!targets.length) {
-    list.innerHTML = "<p class='muted'><i>Belum ada target tabungan</i></p>";
+  targetsList.innerHTML = '';
+  if (targets.length === 0) {
+    targetsList.innerHTML = `<p><i>Belum ada target tabungan</i></p>`;
     return;
   }
   targets.forEach((t, i) => {
-    const div = document.createElement("div");
-    div.className = "card";
-    div.innerHTML = `
-      <h4>${t.name}</h4>
-      <p class="amount">${formatRupiah(t.amount)}</p>
-      <div class="controls">
-        <button class="btn blue" onclick="editTarget(${i})">Edit</button>
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="target-title">
+        <strong>${t.name}</strong>
         <button class="btn red" onclick="deleteTarget(${i})">Hapus</button>
-      </div>`;
-    list.appendChild(div);
+      </div>
+      <p>Target: ${formatRupiah(t.goal)}<br>Tersimpan: ${formatRupiah(t.saved)}</p>
+      <div class="controls">
+        <button class="btn blue" onclick="addToTarget(${i})">+Rp 10.000</button>
+        <button class="btn muted" onclick="resetTarget(${i})">Mengatur ulang</button>
+      </div>
+    `;
+    targetsList.appendChild(card);
   });
 }
-function addTarget(name, amount) {
-  targets.push({ name, amount: parseInt(amount) || 0 });
-  saveFirebase();
-}
-function editTarget(index) {
-  const t = targets[index];
-  const name = prompt("Ubah nama target:", t.name);
-  if (name === null) return;
-  const amount = prompt("Ubah nominal:", t.amount);
-  if (amount === null) return;
-  targets[index] = { name, amount: parseInt(amount) || 0 };
-  saveFirebase();
-}
-function deleteTarget(index) {
-  if (confirm("Hapus target ini?")) {
-    targets.splice(index, 1);
-    saveFirebase();
-  }
-}
 
-// ====== Riwayat ======
-function renderHistory() {
-  const list = byId("transactions-list");
-  list.innerHTML = "";
-  if (!history.length) {
-    list.innerHTML = "<li><i>Belum ada transaksi</i></li>";
+function renderTransactions() {
+  txList.innerHTML = '';
+  if (transactions.length === 0) {
+    txList.innerHTML = `<li><i>Belum ada transaksi</i></li>`;
     return;
   }
-  history.forEach(h => {
-    const li = document.createElement("li");
-    li.textContent = `[${h.time}] +${formatRupiah(h.amount)} (${h.type})`;
-    list.appendChild(li);
+  transactions.forEach(tx => {
+    const li = document.createElement('li');
+    li.textContent = tx;
+    txList.appendChild(li);
   });
 }
-function addHistory(type, amount) {
-  history.unshift({ time: now(), type, amount });
-  if (history.length > 50) history.pop();
-  saveFirebase();
+
+function renderAll() {
+  meetAmount.textContent = formatRupiah(meet);
+  penaltyAmount.textContent = formatRupiah(penalty);
+  const total = meet + penalty + targets.reduce((sum, t) => sum + t.saved, 0);
+  totalAmount.textContent = formatRupiah(total);
+  renderTargets();
+  renderTransactions();
 }
 
-// ====== Tombol Tabungan & Denda ======
-byId("meet-add").onclick = () => {
+// === Fungsi Tabungan & Denda ===
+document.getElementById('meet-add').onclick = () => {
   meet += 5000;
-  addHistory("Tabungan Tiap Ketemu", 5000);
+  localStorage.setItem('meet', meet);
+  logTransaction(`+Rp 5.000 (Tabungan Tiap Ketemu)`);
+  renderAll();
 };
-byId("meet-reset").onclick = () => {
-  if (confirm("Reset tabungan ke 0?")) { meet = 0; saveFirebase(); }
+document.getElementById('meet-reset').onclick = () => {
+  meet = 0;
+  localStorage.setItem('meet', meet);
+  logTransaction(`Reset Tabungan Tiap Ketemu`);
+  renderAll();
 };
-byId("penalty-add").onclick = () => {
+
+document.getElementById('penalty-add').onclick = () => {
   penalty += 50000;
-  addHistory("Denda", 50000);
+  localStorage.setItem('penalty', penalty);
+  logTransaction(`+Rp 50.000 (Denda)`);
+  renderAll();
 };
-byId("penalty-reset").onclick = () => {
-  if (confirm("Reset denda ke 0?")) { penalty = 0; saveFirebase(); }
-};
-byId("clear-history").onclick = () => {
-  if (confirm("Hapus semua riwayat transaksi?")) { history = []; saveFirebase(); }
-};
-
-// ====== Tambah Target ======
-byId("btn-add-target").onclick = () => {
-  byId("modal").classList.remove("hidden");
-  byId("modal-title").textContent = "Tambah Target";
-  byId("target-name").value = "";
-  byId("target-amount").value = "";
-};
-byId("modal-cancel").onclick = () => byId("modal").classList.add("hidden");
-byId("modal-save").onclick = () => {
-  const name = byId("target-name").value.trim();
-  const amount = byId("target-amount").value.trim();
-  if (!name || !amount) return alert("Isi semua kolom!");
-  addTarget(name, amount);
-  byId("modal").classList.add("hidden");
+document.getElementById('penalty-reset').onclick = () => {
+  penalty = 0;
+  localStorage.setItem('penalty', penalty);
+  logTransaction(`Reset Denda`);
+  renderAll();
 };
 
-// ====== Swipe Tabs ======
-const tabsContainer = document.querySelector(".tabs-inner");
-const dots = document.querySelector("#dots");
-const tabs = document.querySelectorAll(".tab");
-let currentTab = 0;
+// === Fungsi Target ===
+document.getElementById('btn-add-target').onclick = () => {
+  document.getElementById('modal-add').classList.remove('hidden');
+};
+document.getElementById('cancel-add').onclick = () => {
+  document.getElementById('modal-add').classList.add('hidden');
+};
+document.getElementById('save-add').onclick = () => {
+  const name = document.getElementById('target-name').value.trim();
+  const goal = parseInt(document.getElementById('target-goal').value);
+  if (!name || isNaN(goal)) return alert('Isi nama dan nominal target!');
+  targets.push({ name, goal, saved: 0 });
+  localStorage.setItem('targets', JSON.stringify(targets));
+  logTransaction(`Tambah target baru: ${name} (${formatRupiah(goal)})`);
+  document.getElementById('modal-add').classList.add('hidden');
+  renderAll();
+};
 
-function updateDots() {
-  dots.innerHTML = "";
-  tabs.forEach((_, i) => {
-    const d = document.createElement("span");
-    d.className = "dot" + (i === currentTab ? " active" : "");
-    d.onclick = () => showTab(i);
-    dots.appendChild(d);
-  });
+function deleteTarget(i) {
+  const name = targets[i].name;
+  targets.splice(i, 1);
+  localStorage.setItem('targets', JSON.stringify(targets));
+  logTransaction(`Hapus target: ${name}`);
+  renderAll();
 }
-function showTab(i) {
-  currentTab = i;
-  tabsContainer.style.transform = `translateX(-${i * 100}%)`;
-  updateDots();
+function addToTarget(i) {
+  targets[i].saved += 10000;
+  localStorage.setItem('targets', JSON.stringify(targets));
+  logTransaction(`+Rp 10.000 ke ${targets[i].name}`);
+  renderAll();
 }
-let startX = 0;
-tabsContainer.addEventListener("touchstart", e => (startX = e.touches[0].clientX));
-tabsContainer.addEventListener("touchend", e => {
-  const diff = e.changedTouches[0].clientX - startX;
-  if (Math.abs(diff) > 60) {
-    if (diff < 0 && currentTab < tabs.length - 1) currentTab++;
-    if (diff > 0 && currentTab > 0) currentTab--;
-    showTab(currentTab);
+function resetTarget(i) {
+  targets[i].saved = 0;
+  localStorage.setItem('targets', JSON.stringify(targets));
+  logTransaction(`Reset tabungan untuk ${targets[i].name}`);
+  renderAll();
+}
+
+document.getElementById('clear-history').onclick = () => {
+  if (confirm('Hapus semua riwayat transaksi?')) {
+    transactions = [];
+    localStorage.removeItem('transactions');
+    renderAll();
   }
-});
-
-// ====== Mode Gelap ======
-byId("toggle-theme").onclick = () => {
-  document.body.classList.toggle("dark");
-  byId("toggle-theme").textContent = document.body.classList.contains("dark") ? "☀" : "🌙";
 };
 
-// ====== Inisialisasi ======
-function init() {
-  updateDots();
-  showTab(0);
-  updateDisplay();
-}
-init();
+// === Tema ===
+const themeToggle = document.getElementById('theme-toggle');
+let dark = true;
+themeToggle.onclick = () => {
+  dark = !dark;
+  document.body.style.background = dark ? '#0f1112' : '#f7f7f7';
+  document.body.style.color = dark ? '#fff' : '#000';
+  themeToggle.textContent = dark ? '🌙' : '☀️';
+};
 
-// === SISTEM SWIPE ANTAR TAB ===
-let startX = 0;
+// === SWIPE 4 TAB ===
 let currentTab = 0;
-const tabs = document.querySelectorAll('.tab');
-const dots = document.querySelectorAll('.dot');
+const tabsInner = document.querySelector('.tabs-inner');
+const totalTabs = document.querySelectorAll('.tab').length;
+const dotsContainer = document.getElementById('dots');
+
+dotsContainer.innerHTML = '';
+for (let i = 0; i < totalTabs; i++) {
+  const btn = document.createElement('button');
+  if (i === 0) btn.classList.add('active');
+  btn.addEventListener('click', () => showTab(i));
+  dotsContainer.appendChild(btn);
+}
 
 function showTab(index) {
-  if (index < 0) index = tabs.length - 1;
-  if (index >= tabs.length) index = 0;
-  tabs.forEach((tab, i) => {
-    tab.style.transform = `translateX(${100 * (i - index)}%)`;
-  });
-  dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
+  if (index < 0) index = totalTabs - 1;
+  if (index >= totalTabs) index = 0;
   currentTab = index;
+  tabsInner.style.transform = `translateX(-${index * 100}vw)`;
+  [...dotsContainer.children].forEach((dot, i) => {
+    dot.classList.toggle('active', i === index);
+  });
 }
 
-document.querySelector('#tabs').addEventListener('touchstart', e => {
-  startX = e.touches[0].clientX;
+let startX = 0;
+tabsInner.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+tabsInner.addEventListener('touchend', e => {
+  const diff = startX - e.changedTouches[0].clientX;
+  if (Math.abs(diff) > 50) showTab(currentTab + (diff > 0 ? 1 : -1));
 });
 
-document.querySelector('#tabs').addEventListener('touchend', e => {
-  const endX = e.changedTouches[0].clientX;
-  const diff = startX - endX;
-  if (Math.abs(diff) > 50) {
-    showTab(currentTab + (diff > 0 ? 1 : -1));
-  }
-});
-
-// Inisialisasi posisi tab
+// === Inisialisasi ===
+renderAll();
 showTab(0);
