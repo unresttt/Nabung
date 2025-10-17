@@ -5,6 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Aplikasi Tabungan</title>
 
+  <script>
+    const APP_VERSION = '2.1.0';
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('link[rel="stylesheet"], script[src], link[rel="manifest"], link[rel="icon"]').forEach(el => {
+        const attr = el.tagName === 'SCRIPT' ? 'src' : 'href';
+        const url = new URL(el.getAttribute(attr), location.origin);
+        url.searchParams.set('v', APP_VERSION);
+        el.setAttribute(attr, url.toString());
+      });
+    });
+  </script>
+
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon-192.png" sizes="192x192">
   <link rel="stylesheet" href="style.css">
@@ -16,20 +28,16 @@
       <h1>Aplikasi Tabungan</h1>
     </header>
 
-    <!-- Tabs wrapper -->
     <div id="tabs-wrapper">
       <div id="tabs" class="tabs-inner">
-        <!-- Tab 1: Targets -->
-        <section class="tab" id="tab-targets" aria-label="Targets">
+        <section class="tab" id="tab-targets">
           <h2>🎯 Daftar Target Tabungan</h2>
           <button id="btn-add-target" class="btn green">+ Tambah Target</button>
           <div id="targets-list" class="card-list"></div>
         </section>
 
-        <!-- Tab 2: Meet & Penalty -->
-        <section class="tab" id="tab-meet" aria-label="Meet and Penalty">
+        <section class="tab" id="tab-meet">
           <h2>🤝 Tabungan Tiap Ketemu & ⚠️ Denda</h2>
-
           <div class="card">
             <h3>Tabungan Tiap Ketemu</h3>
             <p class="amount" id="meet-amount">Rp 0</p>
@@ -51,8 +59,7 @@
           </div>
         </section>
 
-        <!-- Tab 3: Total -->
-        <section class="tab" id="tab-total" aria-label="Total">
+        <section class="tab" id="tab-total">
           <h2>💵 Total Keseluruhan</h2>
           <div class="big-card">
             <p class="big-amount" id="total-amount">Rp 0</p>
@@ -60,8 +67,7 @@
           </div>
         </section>
 
-        <!-- Tab 4: History -->
-        <section class="tab" id="tab-history" aria-label="History">
+        <section class="tab" id="tab-history">
           <h2>📜 Riwayat Transaksi</h2>
           <ul id="transactions-list" class="tx-list"></ul>
           <button id="clear-history" class="btn red">Hapus Riwayat</button>
@@ -69,11 +75,9 @@
       </div>
     </div>
 
-    <!-- Dots (nav) -->
-    <nav id="dots" class="dots" aria-hidden="false"></nav>
+    <nav id="dots" class="dots"></nav>
 
-    <!-- Modal Target -->
-    <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div id="modal" class="modal hidden">
       <div class="modal-card">
         <h3 id="modal-title">Tambah Target</h3>
         <input id="target-name" placeholder="Nama target" />
@@ -88,11 +92,8 @@
     <button id="toggle-theme" class="fab" aria-label="Toggle theme">🌙</button>
   </main>
 
-  <!-- Firebase compat SDKs (we use compat because code uses legacy-style) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-
-  <!-- App (legacy) -->
   <script src="app-legacy.js"></script>
 </body>
 </html>
