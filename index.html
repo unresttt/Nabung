@@ -1,94 +1,105 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Aplikasi Tabungan</title>
 
-  <!-- Theme & Manifest -->
-  <meta name="theme-color" content="#111111">
-  <link rel="manifest" href="manifest.json">
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0b0b0b" />
+  <link rel="icon" href="icon-192.png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
 
-  <!-- Style -->
-  <link rel="stylesheet" href="style.css">
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-
-  <!-- Register Service Worker -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js')
-          .then(() => console.log("✅ Service Worker registered"))
-          .catch(err => console.log("SW failed:", err));
-      });
-    }
-  </script>
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
   <header class="app-header">
-    <h1>💰 Aplikasi Tabungan</h1>
+    <span class="logo">💰</span>
+    <h1>Aplikasi Tabungan</h1>
   </header>
 
-  <main id="tabsContainer" class="tabs-container">
-    <!-- TAB 1: Daftar Target -->
-    <section class="tab-page active">
-      <h2>🎯 Daftar Target Tabungan</h2>
-      <button id="addTargetBtn" class="btn green">+ Tambah Target</button>
-      <div id="targetsList" class="card-list"></div>
-    </section>
-
-    <!-- TAB 2: Tabungan Tiap Ketemu & Denda -->
-    <section class="tab-page">
-      <h2>🤝 Tabungan Tiap Ketemu & ⚠️ Denda</h2>
-      <div class="card">
-        <div class="section">
-          <h3>Tabungan Tiap Ketemu</h3>
-          <p id="meetAmountLabel">Rp 5.000</p>
-          <div class="btn-row">
-            <button id="meetSaveBtn" class="btn blue">Tabung +</button>
-            <button id="resetMeetBtn" class="btn red">Reset</button>
+  <main id="app">
+    <div class="tabs-wrapper">
+      <div class="tabs" id="tabs" aria-live="polite">
+        <!-- Slide 0: Daftar Target -->
+        <section class="slide" data-index="0" id="slide-targets">
+          <div class="card">
+            <h2>🎯 Daftar Target Tabungan</h2>
+            <button id="add-target-btn" class="btn btn-add">+ Tambah Target</button>
+            <div id="targets-list" class="targets-list">
+              <!-- target items injected here -->
+            </div>
           </div>
-        </div>
-        <hr>
-        <div class="section">
-          <h3>Denda</h3>
-          <p id="fineAmountLabel">Rp 50.000</p>
-          <div class="btn-row">
-            <button id="fineSaveBtn" class="btn blue">Tabung +</button>
-            <button id="resetFineBtn" class="btn red">Reset</button>
+        </section>
+
+        <!-- Slide 1: Tabungan tiap ketemu & denda -->
+        <section class="slide" data-index="1" id="slide-tiap">
+          <div class="card">
+            <h2>🤝 Tabungan Tiap Ketemu & ⚠️ Denda</h2>
+            <div class="mini">
+              <div class="mini-row">
+                <div>
+                  <h3>Tabungan Tiap Ketemu</h3>
+                  <div class="amount" id="tiap-value">Rp 0</div>
+                </div>
+                <div class="actions">
+                  <button id="tiap-add" class="btn btn-primary">Tabung +</button>
+                  <button id="tiap-reset" class="btn btn-danger">Reset</button>
+                </div>
+              </div>
+              <hr />
+              <div class="mini-row">
+                <div>
+                  <h3>Denda</h3>
+                  <div class="amount" id="denda-value">Rp 0</div>
+                </div>
+                <div class="actions">
+                  <button id="denda-add" class="btn btn-primary">Tabung +</button>
+                  <button id="denda-reset" class="btn btn-danger">Reset</button>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-    </section>
+        </section>
 
-    <!-- TAB 3: Total -->
-    <section class="tab-page">
-      <h2>💵 Total Keseluruhan</h2>
-      <div class="card big">
-        <div id="totalAmount" class="big-number">Rp 0</div>
-        <div class="muted">Total gabungan semua tabungan, target, dan denda</div>
-      </div>
-    </section>
+        <!-- Slide 2: Total keseluruhan -->
+        <section class="slide" data-index="2" id="slide-total">
+          <div class="card card-center">
+            <h2>💵 Total Keseluruhan</h2>
+            <div id="total-value" class="total-value">Rp 0</div>
+            <p class="muted">(Total gabungan semua tabungan, target & denda)</p>
+          </div>
+        </section>
 
-    <!-- TAB 4: Riwayat -->
-    <section class="tab-page">
-      <h2>🧾 Riwayat Transaksi</h2>
-      <ul id="historyList" class="history"></ul>
-      <button id="clearHistoryBtn" class="btn red">Hapus Semua Riwayat</button>
-    </section>
+        <!-- Slide 3: Riwayat transaksi -->
+        <section class="slide" data-index="3" id="slide-history">
+          <div class="card">
+            <h2>📜 Riwayat Transaksi</h2>
+            <ul id="history-list" class="history-list">
+              <!-- history items -->
+            </ul>
+            <button id="clear-history" class="btn btn-danger">Hapus Riwayat</button>
+          </div>
+        </section>
+      </div>
+
+      <!-- pagination dots -->
+      <div class="dots" id="dots"></div>
+    </div>
   </main>
 
-  <!-- Dots navigation -->
-  <nav id="dots" class="tab-dots"></nav>
+  <!-- Floating theme toggle (kept but optional) -->
+  <button id="install-btn" class="fab" title="Install app">⬇️</button>
 
-  <!-- Tombol mode terang/gelap -->
-  <button id="themeToggle" class="theme-toggle">🌙</button>
+  <!-- Firebase & app script (module) -->
+  <script type="module" src="app.js"></script>
 
-  <!-- Script utama -->
-  <script src="app.js"></script>
+  <!-- service worker register -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js').catch(console.error);
+    }
+  </script>
 </body>
 </html>
