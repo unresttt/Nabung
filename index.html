@@ -1,84 +1,94 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aplikasi Tabungan</title>
 
-  <link rel="manifest" href="/manifest.json" />
-  <meta name="theme-color" content="#0f1724" />
-  <link rel="icon" href="/icon-192.png" />
+  <!-- Theme & Manifest -->
+  <meta name="theme-color" content="#111111">
+  <link rel="manifest" href="manifest.json">
 
-  <link rel="stylesheet" href="style.css" />
-  <!-- Firebase CDN (compat modular) -->
+  <!-- Style -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+  <!-- Register Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js')
+          .then(() => console.log("✅ Service Worker registered"))
+          .catch(err => console.log("SW failed:", err));
+      });
+    }
+  </script>
 </head>
+
 <body>
-  <main class="app">
-    <header><span class="icon">💰</span><h1>Aplikasi Tabungan</h1></header>
+  <header class="app-header">
+    <h1>💰 Aplikasi Tabungan</h1>
+  </header>
 
-    <section id="tabsContainer" class="tabs">
-      <!-- Tab contents (will be full-screen-ish) -->
-      <div class="tab active" data-index="0" id="tab-targets">
-        <h2>🎯 Daftar Target Tabungan</h2>
-        <button id="addTargetBtn" class="btn green">+ Tambah Target</button>
-        <div id="targetsList" class="card-list"></div>
-      </div>
+  <main id="tabsContainer" class="tabs-container">
+    <!-- TAB 1: Daftar Target -->
+    <section class="tab-page active">
+      <h2>🎯 Daftar Target Tabungan</h2>
+      <button id="addTargetBtn" class="btn green">+ Tambah Target</button>
+      <div id="targetsList" class="card-list"></div>
+    </section>
 
-      <div class="tab" data-index="1" id="tab-savings">
-        <h2>🤝 Tabungan Tiap Ketemu & ⚠️ Denda</h2>
-        <div class="card" id="savingsCard">
-          <div class="row">
-            <div>
-              <h3>Tabungan Tiap Ketemu</h3>
-              <div class="muted" id="meetAmountLabel">Rp 5.000</div>
-            </div>
-            <div>
-              <button id="meetSaveBtn" class="btn blue">Tabung +</button>
-              <button id="resetMeetBtn" class="btn red">Reset</button>
-            </div>
-          </div>
-          <hr/>
-          <div class="row">
-            <div>
-              <h3>Denda</h3>
-              <div class="muted" id="fineAmountLabel">Rp 50.000</div>
-            </div>
-            <div>
-              <button id="fineSaveBtn" class="btn blue">Tabung +</button>
-              <button id="resetFineBtn" class="btn red">Reset</button>
-            </div>
+    <!-- TAB 2: Tabungan Tiap Ketemu & Denda -->
+    <section class="tab-page">
+      <h2>🤝 Tabungan Tiap Ketemu & ⚠️ Denda</h2>
+      <div class="card">
+        <div class="section">
+          <h3>Tabungan Tiap Ketemu</h3>
+          <p id="meetAmountLabel">Rp 5.000</p>
+          <div class="btn-row">
+            <button id="meetSaveBtn" class="btn blue">Tabung +</button>
+            <button id="resetMeetBtn" class="btn red">Reset</button>
           </div>
         </div>
-      </div>
-
-      <div class="tab" data-index="2" id="tab-total">
-        <h2>Total Keseluruhan</h2>
-        <div class="card big">
-          <div class="big-number" id="totalAmount">Rp 0</div>
-          <div class="muted">Total gabungan semua tabungan, target & denda</div>
+        <hr>
+        <div class="section">
+          <h3>Denda</h3>
+          <p id="fineAmountLabel">Rp 50.000</p>
+          <div class="btn-row">
+            <button id="fineSaveBtn" class="btn blue">Tabung +</button>
+            <button id="resetFineBtn" class="btn red">Reset</button>
+          </div>
         </div>
-      </div>
-
-      <div class="tab" data-index="3" id="tab-history">
-        <h2>📜 Riwayat Transaksi</h2>
-        <ul id="historyList" class="history"></ul>
-        <button id="clearHistoryBtn" class="btn red">Hapus Riwayat</button>
       </div>
     </section>
 
-    <nav class="dots" id="dots"></nav>
-    <button id="themeToggle" class="floating btn circle">🌙</button>
+    <!-- TAB 3: Total -->
+    <section class="tab-page">
+      <h2>💵 Total Keseluruhan</h2>
+      <div class="card big">
+        <div id="totalAmount" class="big-number">Rp 0</div>
+        <div class="muted">Total gabungan semua tabungan, target, dan denda</div>
+      </div>
+    </section>
+
+    <!-- TAB 4: Riwayat -->
+    <section class="tab-page">
+      <h2>🧾 Riwayat Transaksi</h2>
+      <ul id="historyList" class="history"></ul>
+      <button id="clearHistoryBtn" class="btn red">Hapus Semua Riwayat</button>
+    </section>
   </main>
 
-  <script src="app.js"></script>
+  <!-- Dots navigation -->
+  <nav id="dots" class="tab-dots"></nav>
 
-  <script>
-    // register service worker for PWA
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/service-worker.js').catch(()=>{/*ignore*/});
-    }
-  </script>
+  <!-- Tombol mode terang/gelap -->
+  <button id="themeToggle" class="theme-toggle">🌙</button>
+
+  <!-- Script utama -->
+  <script src="app.js"></script>
 </body>
 </html>
