@@ -2,25 +2,26 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Aplikasi Tabungan</title>
 
   <script>
-    const APP_VERSION = '2.1.0';
-    document.addEventListener('DOMContentLoaded', () => {
-      document.querySelectorAll('link[rel="stylesheet"], script[src], link[rel="manifest"], link[rel="icon"]').forEach(el => {
-        const attr = el.tagName === 'SCRIPT' ? 'src' : 'href';
-        const url = new URL(el.getAttribute(attr), location.origin);
-        url.searchParams.set('v', APP_VERSION);
-        el.setAttribute(attr, url.toString());
-      });
-    });
+    // === AUTO APP VERSION (berdasarkan tanggal + jam) ===
+    const now = new Date();
+    const app_version = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}-${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
+    console.log("App Version:", app_version);
   </script>
 
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="icon-192.png" sizes="192x192">
-  <link rel="stylesheet" href="style.css">
+  <!-- Manifest dan Icon -->
+  <script>
+    document.write(`
+      <link rel="manifest" href="manifest.json?v=${app_version}">
+      <link rel="icon" href="icon-192.png" sizes="192x192">
+      <link rel="stylesheet" href="style.css?v=${app_version}">
+    `);
+  </script>
 </head>
+
 <body>
   <main id="app">
     <header class="app-header">
@@ -28,55 +29,59 @@
       <h1>Aplikasi Tabungan</h1>
     </header>
 
-    <div id="tabs-wrapper">
-      <div id="tabs" class="tabs-inner">
-        <section class="tab" id="tab-targets">
-          <h2>🎯 Daftar Target Tabungan</h2>
-          <button id="btn-add-target" class="btn green">+ Tambah Target</button>
-          <div id="targets-list" class="card-list"></div>
-        </section>
-
-        <section class="tab" id="tab-meet">
-          <h2>🤝 Tabungan Tiap Ketemu & ⚠️ Denda</h2>
-          <div class="card">
-            <h3>Tabungan Tiap Ketemu</h3>
-            <p class="amount" id="meet-amount">Rp 0</p>
-            <div class="controls">
-              <button id="meet-add" class="btn blue">Tabung +</button>
-              <button id="meet-reset" class="btn red">Reset</button>
-            </div>
-          </div>
-
-          <div class="divider"></div>
-
-          <div class="card">
-            <h3>Denda</h3>
-            <p class="amount" id="penalty-amount">Rp 0</p>
-            <div class="controls">
-              <button id="penalty-add" class="btn blue">Tabung +</button>
-              <button id="penalty-reset" class="btn red">Reset</button>
-            </div>
-          </div>
-        </section>
-
-        <section class="tab" id="tab-total">
-          <h2>💵 Total Keseluruhan</h2>
-          <div class="big-card">
-            <p class="big-amount" id="total-amount">Rp 0</p>
-            <p class="muted">Total gabungan semua tabungan, target, dan denda</p>
-          </div>
-        </section>
-
-        <section class="tab" id="tab-history">
-          <h2>📜 Riwayat Transaksi</h2>
-          <ul id="transactions-list" class="tx-list"></ul>
-          <button id="clear-history" class="btn red">Hapus Riwayat</button>
-        </section>
+    <section id="tabs" class="tabs">
+      <!-- TAB 1: TARGET -->
+      <div class="tab" id="tab-targets">
+        <h2>🎯 Daftar Target Tabungan</h2>
+        <button id="btn-add-target" class="btn green">+ Tambah Target</button>
+        <div id="targets-list" class="card-list"></div>
       </div>
-    </div>
+
+      <!-- TAB 2: TIAP KETEMU / DENDA -->
+      <div class="tab" id="tab-meet">
+        <h2>🤝 Tabungan Tiap Ketemu & ⚠️ Denda</h2>
+
+        <div class="card">
+          <h3>Tabungan Tiap Ketemu</h3>
+          <p class="amount" id="meet-amount">Rp 0</p>
+          <div class="controls">
+            <button id="meet-add" class="btn blue">Tabung +</button>
+            <button id="meet-reset" class="btn red">Reset</button>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="card">
+          <h3>Denda</h3>
+          <p class="amount" id="penalty-amount">Rp 0</p>
+          <div class="controls">
+            <button id="penalty-add" class="btn blue">Tabung +</button>
+            <button id="penalty-reset" class="btn red">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: TOTAL -->
+      <div class="tab" id="tab-total">
+        <h2>💵 Total Keseluruhan</h2>
+        <div class="big-card">
+          <p class="big-amount" id="total-amount">Rp 0</p>
+          <p class="muted">Total gabungan semua tabungan, target, dan denda</p>
+        </div>
+      </div>
+
+      <!-- TAB 4: RIWAYAT -->
+      <div class="tab" id="tab-history">
+        <h2>📜 Riwayat Transaksi</h2>
+        <ul id="transactions-list" class="tx-list"></ul>
+        <button id="clear-history" class="btn red">Hapus Riwayat</button>
+      </div>
+    </section>
 
     <nav id="dots" class="dots"></nav>
 
+    <!-- Modal Target -->
     <div id="modal" class="modal hidden">
       <div class="modal-card">
         <h3 id="modal-title">Tambah Target</h3>
@@ -89,11 +94,17 @@
       </div>
     </div>
 
-    <button id="toggle-theme" class="fab" aria-label="Toggle theme">🌙</button>
+    <!-- Tombol Tema -->
+    <button id="toggle-theme" class="fab">🌙</button>
   </main>
 
+  <!-- Firebase SDK (compat) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <script src="app-legacy.js"></script>
+
+  <!-- Script utama (auto versioned) -->
+  <script>
+    document.write(`<script src="app-legacy.js?v=${app_version}"><\/script>`);
+  </script>
 </body>
 </html>
