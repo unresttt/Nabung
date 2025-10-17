@@ -5,100 +5,95 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Aplikasi Tabungan</title>
 
-  <!-- PWA -->
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#0b0b0b" />
   <link rel="icon" href="icon-192.png" sizes="192x192" />
-  <link rel="apple-touch-icon" href="icon-192.png" />
-
   <link rel="stylesheet" href="style.css" />
+  <!-- Firebase SDK (modular) via CDN -->
+  <script type="module">
+    // initialize firebase used by app.js (app.js will import firebase modules)
+  </script>
 </head>
 <body>
-  <header class="app-header">
-    <span class="logo">💰</span>
-    <h1>Aplikasi Tabungan</h1>
-  </header>
-
   <main id="app">
-    <div class="tabs-wrapper">
-      <div class="tabs" id="tabs" aria-live="polite">
-        <!-- Slide 0: Daftar Target -->
-        <section class="slide" data-index="0" id="slide-targets">
-          <div class="card">
-            <h2>🎯 Daftar Target Tabungan</h2>
-            <button id="add-target-btn" class="btn btn-add">+ Tambah Target</button>
-            <div id="targets-list" class="targets-list">
-              <!-- target items injected here -->
-            </div>
-          </div>
-        </section>
+    <header class="app-header">
+      <div class="logo">💰</div>
+      <h1>Aplikasi Tabungan</h1>
+    </header>
 
-        <!-- Slide 1: Tabungan tiap ketemu & denda -->
-        <section class="slide" data-index="1" id="slide-tiap">
-          <div class="card">
-            <h2>🤝 Tabungan Tiap Ketemu & ⚠️ Denda</h2>
-            <div class="mini">
-              <div class="mini-row">
-                <div>
-                  <h3>Tabungan Tiap Ketemu</h3>
-                  <div class="amount" id="tiap-value">Rp 0</div>
-                </div>
-                <div class="actions">
-                  <button id="tiap-add" class="btn btn-primary">Tabung +</button>
-                  <button id="tiap-reset" class="btn btn-danger">Reset</button>
-                </div>
-              </div>
-              <hr />
-              <div class="mini-row">
-                <div>
-                  <h3>Denda</h3>
-                  <div class="amount" id="denda-value">Rp 0</div>
-                </div>
-                <div class="actions">
-                  <button id="denda-add" class="btn btn-primary">Tabung +</button>
-                  <button id="denda-reset" class="btn btn-danger">Reset</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Slide 2: Total keseluruhan -->
-        <section class="slide" data-index="2" id="slide-total">
-          <div class="card card-center">
-            <h2>💵 Total Keseluruhan</h2>
-            <div id="total-value" class="total-value">Rp 0</div>
-            <p class="muted">(Total gabungan semua tabungan, target & denda)</p>
-          </div>
-        </section>
-
-        <!-- Slide 3: Riwayat transaksi -->
-        <section class="slide" data-index="3" id="slide-history">
-          <div class="card">
-            <h2>📜 Riwayat Transaksi</h2>
-            <ul id="history-list" class="history-list">
-              <!-- history items -->
-            </ul>
-            <button id="clear-history" class="btn btn-danger">Hapus Riwayat</button>
-          </div>
-        </section>
+    <!-- Tabs container (full-screen tab style) -->
+    <section id="tabs" class="tabs">
+      <div class="tab" id="tab-targets">
+        <h2>🎯 Daftar Target Tabungan</h2>
+        <button id="btn-add-target" class="btn green">+ Tambah Target</button>
+        <div id="targets-list" class="card-list">
+          <!-- target cards injected here -->
+        </div>
       </div>
 
-      <!-- pagination dots -->
-      <div class="dots" id="dots"></div>
+      <div class="tab" id="tab-meet">
+        <h2>🤝 Tabungan Tiap Ketemu & ⚠️ Denda</h2>
+        <div class="card">
+          <h3>Tabungan Tiap Ketemu</h3>
+          <p class="amount" id="meet-amount">Rp 0</p>
+          <div class="controls">
+            <button id="meet-add" class="btn blue">Tabung +</button>
+            <button id="meet-reset" class="btn red">Reset</button>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="card">
+          <h3>Denda</h3>
+          <p class="amount" id="penalty-amount">Rp 0</p>
+          <div class="controls">
+            <button id="penalty-add" class="btn blue">Tabung +</button>
+            <button id="penalty-reset" class="btn red">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab" id="tab-total">
+        <h2>💵 Total Keseluruhan</h2>
+        <div class="big-card">
+          <p class="big-amount" id="total-amount">Rp 0</p>
+          <p class="muted">Total gabungan semua tabungan, target, dan denda</p>
+        </div>
+      </div>
+
+      <div class="tab" id="tab-history">
+        <h2>📜 Riwayat Transaksi</h2>
+        <ul id="transactions-list" class="tx-list">
+          <!-- transaksi inject -->
+        </ul>
+        <button id="clear-history" class="btn red">Hapus Riwayat</button>
+      </div>
+    </section>
+
+    <!-- pagination dots -->
+    <nav id="dots" class="dots"></nav>
+
+    <!-- add/edit target modal (simple) -->
+    <div id="modal" class="modal hidden">
+      <div class="modal-card">
+        <h3 id="modal-title">Tambah Target</h3>
+        <input id="target-name" placeholder="Nama target (contoh: Beli Helm)" />
+        <input id="target-amount" placeholder="Target (angka, tanpa . atau Rp)" inputmode="numeric"/>
+        <div class="modal-actions">
+          <button id="modal-cancel" class="btn muted">Batal</button>
+          <button id="modal-save" class="btn green">Simpan</button>
+        </div>
+      </div>
     </div>
+
+    <button id="toggle-theme" class="fab">🌙</button>
   </main>
 
-  <!-- Floating theme toggle (kept but optional) -->
-  <button id="install-btn" class="fab" title="Install app">⬇️</button>
-
-  <!-- Firebase & app script (module) -->
   <script type="module" src="app.js"></script>
-
-  <!-- service worker register -->
   <script>
+    // register service worker
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js').catch(console.error);
+      navigator.serviceWorker.register('service-worker.js').catch(e => console.warn('SW reg fail', e));
     }
   </script>
 </body>
