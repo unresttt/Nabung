@@ -1,90 +1,74 @@
 :root{
-  --bg:#121212;
-  --card:#232323;
-  --muted:#bdbdbd;
-  --accent:#08d8a3;
-  --blue:#0b86ff;
-  --red:#e64b56;
-  --green:#18b28a;
-  --glass: rgba(255,255,255,0.03);
-  --text:#fff;
-}
-html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;}
-body{
-  background:var(--bg);
-  color:var(--text);
-  -webkit-font-smoothing:antialiased;
-  display:flex;
-  flex-direction:column;
+  --bg:#0b0e11;
+  --card:#17181a;
+  --muted:#9aa0a6;
+  --accent:#0ea5a4;
+  --blue:#1976ff;
+  --red:#e04b5a;
+  --green:#16a085;
+  --yellow:#f0ad4e;
+  --text:#ffffff;
+  --radius:14px;
 }
 
-/* Header */
-.app-header{
-  padding:18px 24px 6px;
-  display:flex;align-items:center;gap:12px;
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Inter, system-ui, Arial;background:var(--bg);color:var(--text)}
+.app{max-width:900px;margin:0 auto;padding:18px 18px 120px}
+header{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+header .icon{font-size:34px}
+header h1{font-size:34px;margin:0;font-weight:700}
+
+/* tabs container */
+.tabs{position:relative;min-height:60vh;overflow:hidden}
+.tab{
+  position:absolute;left:0;right:0;top:0;
+  padding:18px;
+  transition:opacity .35s ease, transform .35s ease;
+  opacity:0; transform:translateY(10px); pointer-events:none;
 }
-.app-header h1{font-size:34px;margin:0;font-weight:800;letter-spacing:0.4px;}
-.logo{font-size:28px;margin-right:6px}
+.tab.active{opacity:1;transform:none;pointer-events:auto}
 
-/* Tabs container full-screen per tab */
-.tabs-wrapper{flex:1;display:flex;align-items:flex-start;justify-content:center;overflow:hidden;}
-.tabs-container{width:100%;height:100%;display:flex;flex-direction:row;transition:transform .35s ease;touch-action:pan-y;}
-.tab{min-width:100%;height:calc(100vh - 120px);display:flex;align-items:flex-start;justify-content:center;padding:20px 16px;box-sizing:border-box;}
-.fullscreen{ /* keep each tab full screen content area */}
+/* cards */
+.card{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 8px 18px rgba(0,0,0,.6);margin:12px 0}
+.card.big{padding:28px;text-align:center}
+.card-list .card{margin-bottom:14px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+h2{margin:0 0 12px;font-size:22px;opacity:1}
+h3{margin:0;font-size:18px}
 
-/* Card */
-.card{width:100%;max-width:760px;background:var(--card);border-radius:18px;padding:26px;box-shadow:0 14px 18px rgba(0,0,0,0.45);opacity:1;}
-.card h2{margin:0 0 14px;font-size:22px;font-weight:800;display:flex;align-items:center;gap:10px;color:var(--text);opacity:1;}
-.center{text-align:center;}
-.big-amount{font-size:28px;font-weight:800;margin:12px 0;color:var(--text);}
-.muted{color:var(--muted);font-weight:600;}
+/* list */
+.history{list-style:disc;padding-left:20px;color:var(--text)}
+.muted{color:var(--muted);margin-top:6px}
 
-/* Buttons */
-.btn{padding:10px 16px;border-radius:12px;border:none;color:#fff;cursor:pointer;font-weight:700;margin:6px 6px 6px 0;}
+/* buttons */
+.btn{display:inline-block;padding:10px 14px;border-radius:10px;border:none;color:#fff;font-weight:600;cursor:pointer;box-shadow:0 6px 10px rgba(0,0,0,.35)}
 .btn.blue{background:var(--blue)}
 .btn.red{background:var(--red)}
 .btn.green{background:var(--green)}
-.btn.yellow{background:#ffb400}
-.row.actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center;}
-
-/* Targets list */
-.targets-list{margin-top:18px;display:flex;flex-direction:column;gap:16px}
-.target-item{background:var(--glass);padding:18px;border-radius:12px;display:flex;flex-direction:column;gap:12px}
-.target-head{display:flex;justify-content:space-between;align-items:center}
-.target-title{font-weight:800;font-size:18px}
-.progress-bar{height:10px;background:rgba(255,255,255,0.08);border-radius:10px;overflow:hidden}
-.progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--accent),#0bb6ff);}
-
-/* history list */
-.history-list{list-style:disc;padding-left:20px;color:var(--text);font-weight:700}
+.btn.yellow{background:var(--yellow);color:#111}
+.btn.circle{width:56px;height:56px;border-radius:999px;display:flex;align-items:center;justify-content:center;padding:0;box-shadow:0 8px 18px rgba(0,0,0,.45);position:fixed;right:18px;bottom:18px}
 
 /* dots nav */
-.dots{position:fixed;left:50%;transform:translateX(-50%);bottom:88px;display:flex;gap:10px;z-index:30;}
-.dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.25)}
-.dot.active{background:var(--text)}
+.dots{display:flex;gap:10px;justify-content:center;margin-top:20vh}
+.dots button{width:12px;height:12px;border-radius:50%;background:#556;opacity:.5;border:none}
+.dots button.active{background:#fff;opacity:1;box-shadow:0 6px 10px rgba(0,0,0,.4)}
 
-/* theme toggle (bottom-right) */
-.fab{position:fixed;right:22px;bottom:18px;border-radius:999px;border:none;padding:14px 14px;font-size:18px;background:rgba(255,255,255,0.06);color:var(--text);box-shadow:0 8px 14px rgba(0,0,0,0.4);cursor:pointer;}
+/* progress bar small */
+.progress-bar{height:10px;background:#333;border-radius:12px;overflow:hidden;margin-top:8px}
+.progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--accent),#00c3ff);}
 
-/* make text very readable (user asked bolder) */
-*{text-rendering:optimizeLegibility}
-h1,h2,h3,p,button{font-weight:700}
+/* big number */
+.big-number{font-size:34px;font-weight:800;margin:6px 0}
 
-/* Light theme override (applied to body.light) */
-body.light{
-  --bg:#dff2ff;
-  --card:#e6f2ff;
-  --muted:#4b5563;
-  --accent:#06d6a0;
-  --blue:#007aff;
-  --red:#e64b56;
-  --green:#189e79;
-  --glass: rgba(255,255,255,0.75);
-  --text:#0b1220;
+/* target card buttons */
+.target-actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.target-title{font-weight:700;font-size:18px}
+
+/* responsiveness */
+@media(min-width:900px){
+  .app{padding:28px}
+  .tabs{min-height:66vh}
 }
 
-/* responsive */
-@media (max-width:520px){
-  .app-header h1{font-size:28px}
-  .card{padding:20px}
-}
+/* fade overlay to make text heavier when dimming */
+.dimmed .tab{opacity:.3}
