@@ -1,122 +1,119 @@
-// Firebase Config
+// ===== Firebase Init =====
 const firebaseConfig = {
   apiKey: "AIzaSyC7boFrn964XUBRZf0xdyjqst3bsk_s_AE",
   authDomain: "tabungan-kita-a2b49.firebaseapp.com",
   databaseURL: "https://tabungan-kita-a2b49-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "tabungan-kita-a2b49",
-  storageBucket: "tabungan-kita-a2b49.firebasestorage.app",
+  storageBucket: "tabungan-kita-a2b49.appspot.com",
   messagingSenderId: "203588830235",
-  appId: "1:203588830235:web:b3d7adb92b0647953264be",
-  measurementId: "G-7D99H7QWHK"
+  appId: "1:203588830235:web:b3d7adb92b0647953264be"
 };
-
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-const ROOT = "digambar";
-const tabs = document.querySelector("#tabs");
-const dots = document.querySelector("#dots");
-const tabEls = document.querySelectorAll(".tab");
+// ===== Helper =====
+function formatRupiah(n){return "Rp " + n.toLocaleString("id-ID");}
+function byId(id){return document.getElementById(id);}
+function now(){return new Date().toLocaleString("id-ID",{hour12:false});}
 
-let currentTab = 0;
-function setTab(i) {
-  currentTab = i;
-  tabs.style.transform = `translateX(-${i * 100}%)`;
-  document.querySelectorAll(".dot").forEach((d, j) => d.classList.toggle("active", j === i));
+// ===== Elemen =====
+const meetAmt = byId("meet-amount");
+const penaltyAmt = byId("penalty-amount");
+const totalAmt = byId("total-amount");
+const txList = byId("transactions-list");
+const dots = byId("dots");
+
+// ===== Data Lokal =====
+let meet = 0, penalty = 0, history = [];
+
+// ===== Firebase Sync =====
+const refRoot = db.ref("sharedData");
+refRoot.on("value", snap=>{
+  const data = snap.val();
+  if(!data) return;
+  meet = data.meet||0;
+  penalty = data.penalty||0;
+  history = data.history||[];
+  updateDisplay();
+});
+
+function saveFirebase(){
+  refRoot.set({meet, penalty, history});
 }
 
-function buildDots() {
-  dots.innerHTML = "";
-  tabEls.forEach((_, i) => {
-    const d = document.createElement("div");
-    d.className = "dot" + (i === 0 ? " active" : "");
-    d.onclick = () => setTab(i);
+// ===== Update Tampilan =====
+function updateDisplay(){
+  meetAmt.textContent = formatRupiah(meet);
+  penaltyAmt.textContent = formatRupiah(penalty);
+  totalAmt.textContent = formatRupiah(meet + penalty);
+  renderHistory();
+}
+
+function renderHistory(){
+  txList.innerHTML = history.length ? "" : "<li><i>Belum ada transaksi</i></li>";
+  history.forEach(item=>{
+    const li=document.createElement("li");
+    li.textContent=`[${item.time}] +${formatRupiah(item.amount)} (${item.type})`;
+    txList.appendChild(li);
+  });
+}
+
+// ===== Tombol Aksi =====
+byId("meet-add").onclick=()=>{
+  meet+=5000;
+  history.unshift({time:now(),type:"Tabungan Tiap Ketemu",amount:5000});
+  saveFirebase(); updateDisplay();
+};
+byId("meet-reset").onclick=()=>{
+  if(confirm("Reset tabungan ke 0?")){meet=0; saveFirebase(); updateDisplay();}
+};
+byId("penalty-add").onclick=()=>{
+  penalty+=50000;
+  history.unshift({time:now(),type:"Denda",amount:50000});
+  saveFirebase(); updateDisplay();
+};
+byId("penalty-reset").onclick=()=>{
+  if(confirm("Reset denda ke 0?")){penalty=0; saveFirebase(); updateDisplay();}
+};
+byId("clear-history").onclick=()=>{
+  if(confirm("Hapus semua riwayat?")){history=[]; saveFirebase(); updateDisplay();}
+};
+
+// ===== Swipe Tabs =====
+const tabs = document.querySelectorAll(".tab");
+let currentTab=0;
+function showTab(i){
+  currentTab=i;
+  tabs.forEach((t,idx)=>t.style.transform=`translateX(${100*(idx-i)}%)`);
+  updateDots();
+}
+function updateDots(){
+  dots.innerHTML="";
+  tabs.forEach((_,i)=>{
+    const d=document.createElement("span");
+    d.className="dot"+(i===currentTab?" active":"");
+    d.onclick=()=>showTab(i);
     dots.appendChild(d);
   });
 }
-buildDots();
-
-// Swipe gesture
-let startX = 0;
-tabs.addEventListener("touchstart", e => (startX = e.touches[0].clientX));
-tabs.addEventListener("touchend", e => {
-  const diff = e.changedTouches[0].clientX - startX;
-  if (Math.abs(diff) > 50) {
-    if (diff < 0 && currentTab < tabEls.length - 1) setTab(currentTab + 1);
-    if (diff > 0 && currentTab > 0) setTab(currentTab - 1);
+let startX=0;
+document.querySelector(".tabs").addEventListener("touchstart",e=>startX=e.touches[0].clientX);
+document.querySelector(".tabs").addEventListener("touchend",e=>{
+  const diff=e.changedTouches[0].clientX-startX;
+  if(Math.abs(diff)>50){
+    if(diff<0 && currentTab<tabs.length-1) currentTab++;
+    else if(diff>0 && currentTab>0) currentTab--;
+    showTab(currentTab);
   }
 });
 
-// Format Rp
-function formatRp(n) {
-  return "Rp " + (n || 0).toLocaleString("id-ID");
-}
+// ===== Tema =====
+const themeBtn = byId("toggle-theme");
+themeBtn.onclick=()=>{
+  document.body.classList.toggle("dark");
+  themeBtn.textContent=document.body.classList.contains("dark")?"☀":"🌙";
+};
 
-// ================== Fitur utama ==================
-const meetAmountEl = document.getElementById("meet-amount");
-const penaltyAmountEl = document.getElementById("penalty-amount");
-const totalAmountEl = document.getElementById("total-amount");
-
-const STEP_MEET = 5000;
-const STEP_PENALTY = 50000;
-
-// Fungsi update
-function updateUI() {
-  db.ref(`${ROOT}/meet`).once("value", s => meetAmountEl.textContent = formatRp(s.val() || 0));
-  db.ref(`${ROOT}/penalty`).once("value", s => penaltyAmountEl.textContent = formatRp(s.val() || 0));
-}
-updateUI();
-
-// Tombol aksi
-document.getElementById("meet-add").onclick = () => add("meet", STEP_MEET);
-document.getElementById("penalty-add").onclick = () => add("penalty", STEP_PENALTY);
-document.getElementById("meet-reset").onclick = () => db.ref(`${ROOT}/meet`).set(0);
-document.getElementById("penalty-reset").onclick = () => db.ref(`${ROOT}/penalty`).set(0);
-
-function add(type, step) {
-  const refPath = db.ref(`${ROOT}/${type}`);
-  refPath.once("value", snap => {
-    const val = (snap.val() || 0) + step;
-    refPath.set(val);
-    db.ref(`${ROOT}/transactions`).push({
-      ts: Date.now(),
-      text: `[${new Date().toLocaleString()}] +${formatRp(step)} (${type})`
-    });
-  });
-}
-
-// ================== Total & Riwayat ==================
-db.ref(`${ROOT}/transactions`).on("value", s => {
-  const txList = document.getElementById("transactions-list");
-  txList.innerHTML = "";
-  const data = s.val() || {};
-  Object.values(data)
-    .sort((a, b) => b.ts - a.ts)
-    .forEach(tx => {
-      const li = document.createElement("li");
-      li.textContent = tx.text;
-      txList.appendChild(li);
-    });
-});
-
-db.ref(`${ROOT}/meet`).on("value", calcTotal);
-db.ref(`${ROOT}/penalty`).on("value", calcTotal);
-db.ref(`${ROOT}/targets`).on("value", calcTotal);
-function calcTotal() {
-  Promise.all([
-    db.ref(`${ROOT}/meet`).once("value"),
-    db.ref(`${ROOT}/penalty`).once("value"),
-    db.ref(`${ROOT}/targets`).once("value")
-  ]).then(([m, p, t]) => {
-    const meet = m.val() || 0;
-    const pen = p.val() || 0;
-    const targets = t.val() || {};
-    let total = meet + pen;
-    for (let key in targets) total += targets[key].saved || 0;
-    totalAmountEl.textContent = formatRp(total);
-  });
-}
-
-// ================== Mode Gelap ==================
-const btnTheme = document.getElementById("toggle-theme");
-btnTheme.onclick = () => document.body.classList.toggle("light");
+// ===== Inisialisasi =====
+showTab(0);
+updateDisplay();
